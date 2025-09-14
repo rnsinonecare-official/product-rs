@@ -2,7 +2,6 @@
 # Copy these to your Vercel project settings
 
 NODE_ENV=production
-PORT=5000
 FRONTEND_URL=https://your-frontend-vercel-url.vercel.app
 
 # Firebase Configuration
@@ -27,8 +26,12 @@ RATE_LIMIT_MAX_REQUESTS=50
 # Logging
 LOG_LEVEL=error
 
-# Firebase Service Account (Base64 encoded)
-GOOGLE_SERVICE_ACCOUNT_KEY=<base64-encoded-service-account-json>
+# Service Account Keys (JSON format - NOT base64)
+# Copy the entire JSON content from your service account files:
+FIREBASE_SERVICE_ACCOUNT_KEY={"type":"service_account","project_id":"rainscare-58fdb",...}
+GOOGLE_SERVICE_ACCOUNT_KEY={"type":"service_account","project_id":"rainscare",...}
 
-# Note: For Firebase service account, encode your service-account.json file to base64:
-# cat config/service-account.json | base64 -w 0
+# Note: 
+# 1. Copy the ENTIRE JSON content from config/firebase-service-account.json as FIREBASE_SERVICE_ACCOUNT_KEY
+# 2. Copy the ENTIRE JSON content from config/service-account.json as GOOGLE_SERVICE_ACCOUNT_KEY
+# 3. Make sure the JSON is properly formatted (no line breaks in Vercel env vars)
