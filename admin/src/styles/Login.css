@@ -1,0 +1,312 @@
+/* Login Component Specific Styles */
+
+/* Ensure text is always visible */
+.login-text {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  font-weight: 600;
+  color: #ffffff !important;
+}
+
+/* Force white text for all login elements */
+.login-card * {
+  color: #ffffff !important;
+}
+
+.login-card label {
+  color: #f3f4f6 !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.login-card p {
+  color: #e5e7eb !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.login-card span {
+  color: inherit !important;
+}
+
+.login-input {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.login-input::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-weight: 400;
+}
+
+.login-input:focus::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Button glow effect */
+.login-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.login-button * {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  position: relative;
+}
+
+.login-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+  z-index: 1;
+}
+
+.login-button:hover::before {
+  left: 100%;
+}
+
+.login-button:disabled * {
+  color: #d1d5db !important;
+}
+
+/* Card animations */
+.login-card {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Floating animation for icons */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Pulse animation for important elements */
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(147, 51, 234, 0.6);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Shimmer effect for text */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, #ffffff 0%, #60a5fa 50%, #ffffff 100%);
+  background-size: 200px 100%;
+  background-repeat: no-repeat;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Enhanced visibility for form elements */
+.form-field {
+  position: relative;
+}
+
+.form-field input {
+  color: #ffffff !important;
+  font-weight: 500;
+}
+
+.form-field input:focus {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.form-field label {
+  color: #e5e7eb !important;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Demo credentials styling */
+.demo-credentials {
+  background: linear-gradient(135deg, rgba(55, 65, 81, 0.8), rgba(75, 85, 99, 0.8));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(156, 163, 175, 0.3);
+}
+
+.demo-credentials:hover {
+  background: linear-gradient(135deg, rgba(55, 65, 81, 0.9), rgba(75, 85, 99, 0.9));
+  border-color: rgba(156, 163, 175, 0.5);
+}
+
+.demo-credentials * {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Demo button styling */
+.demo-button {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.demo-button:hover {
+  background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+  transform: translateY(-1px);
+}
+
+/* Error message styling */
+.error-message {
+  color: #fca5a5 !important;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Success message styling */
+.success-message {
+  color: #86efac !important;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Loading state */
+.loading-overlay {
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .login-card {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .login-text {
+    font-size: 0.875rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .login-input {
+    border-width: 2px;
+    background-color: rgba(255, 255, 255, 0.2) !important;
+  }
+  
+  .login-text {
+    color: #ffffff !important;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* Additional visibility improvements */
+.login-card h1,
+.login-card h2,
+.login-card h3 {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.login-card button {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.login-card input {
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+.login-card input::placeholder {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-weight: 400 !important;
+}
+
+/* Icon visibility */
+.login-card svg {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+/* Specific button text visibility */
+.login-button span,
+.demo-button span {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+  z-index: 20 !important;
+  position: relative !important;
+}
+
+/* Loading state text */
+.login-button:disabled span {
+  color: #f3f4f6 !important;
+  opacity: 0.9;
+}
+
+/* Enhanced animations */
+.enhanced-fade-in {
+  animation: enhancedFadeIn 0.8s ease-out forwards;
+}
+
+@keyframes enhancedFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.stagger-animation {
+  animation: staggerIn 0.6s ease-out forwards;
+}
+
+@keyframes staggerIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .float-animation,
+  .pulse-glow,
+  .shimmer-text,
+  .enhanced-fade-in,
+  .stagger-animation {
+    animation: none;
+  }
+}

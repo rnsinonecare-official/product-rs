@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Admin collections - allow full access for admin operations
+    match /announcements/{document} {
+      allow read, write: if true;
+    }
+
+    match /updates/{document} {
+      allow read, write: if true;
+    }
+
+    match /healthTips/{document} {
+      allow read, write: if true;
+    }
+
+    match /successStories/{document} {
+      allow read, write: if true;
+    }
+
+    match /doctors/{document} {
+      allow read, write: if true;
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Daily intake subcollection
+      match /daily_intake/{date} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+
+        // Food entries subcollection
+        match /food_entries/{entryId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+
+      // Goals subcollection
+      match /goals/{document} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Daily metrics subcollection
+      match /dailyMetrics/{date} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Food diary and other collections
+    match /foodDiary/{document} {
+      allow read, write: if request.auth != null && request.auth.uid == document;
+    }
+
+    match /healthCheck/{document} {
+      allow read, write: if true;
+    }
+  }
+}

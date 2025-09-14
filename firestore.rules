@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read/write their own profile data and all subcollections
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+      
+      // User's daily intake data
+      match /daily_intake/{date} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+        
+        // Food entries within daily intake
+        match /food_entries/{entryId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+      
+      // User's goals data
+      match /goals/{goalType} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // User's health metrics
+      match /health_metrics/{date} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // User's favorite recipes
+      match /favorite_recipes/{recipeId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // User's generated recipes
+      match /generated_recipes/{recipeId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+    
+    // Legacy collections for backward compatibility
+    // Users can read/write their own food diary entries
+    match /foodDiary/{entryId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Users can read/write their own health metrics
+    match /healthMetrics/{metricId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Users can read/write their own favorite recipes
+    match /favoriteRecipes/{recipeId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Users can read/write their own goals (legacy)
+    match /userGoals/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Public read access for shared recipes, write for authenticated users
+    match /sharedRecipes/{recipeId} {
+      allow read: if resource.data.isPublic == true || request.auth != null && request.auth.uid == resource.data.userId;
+      allow write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // User sessions for analytics
+    match /userSessions/{sessionId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Marketing consent data
+    match /marketingConsent/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Default fallback rule for anything else (deny all)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
