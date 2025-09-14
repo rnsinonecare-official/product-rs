@@ -52,6 +52,9 @@ const corsOptions = {
     "http://192.168.70.214:3000",
     "http://192.168.70.214:3001",
     "http://192.168.70.214:3002",
+    // Allow custom domain
+    "https://www.rainscare.com",
+    "https://rainscare.com",
     // Allow Vercel deployment URLs
     /\.vercel\.app$/,
     // Allow Vercel preview URLs
