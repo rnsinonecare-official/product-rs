@@ -10,7 +10,20 @@ try {
   if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
     // Use service account from environment variable
     console.log("🔑 Using Firebase service account from environment variables");
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+    let serviceAccount;
+    try {
+      // Try to parse as JSON first
+      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+    } catch (e) {
+      // If JSON parsing fails, try base64 decoding first
+      try {
+        const decoded = Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_KEY, 'base64').toString('utf8');
+        serviceAccount = JSON.parse(decoded);
+        console.log("🔑 Decoded base64 service account");
+      } catch (e2) {
+        throw new Error('Invalid FIREBASE_SERVICE_ACCOUNT_KEY format. Must be JSON or base64 encoded JSON.');
+      }
+    }
     credential = admin.credential.cert(serviceAccount);
   } else {
     // Fallback to service account file (for local development)
