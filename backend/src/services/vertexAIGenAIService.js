@@ -6,75 +6,37 @@ let genAI;
 let textModel;
 let imageModel;
 
-const projectId = process.env.GOOGLE_CLOUD_PROJECT || "rainscare-58fdb";
+const projectId = process.env.GOOGLE_CLOUD_PROJECT || "rainscare";
 const location = process.env.GOOGLE_CLOUD_LOCATION || "us-central1";
 
 try {
-  console.log("🔍 Initializing Google GenAI with Vertex AI...");
+  console.log("🔍 Initializing Google GenAI with Vertex AI using API key...");
 
-  // Set up authentication using environment variables
-  if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
-    // Parse the service account from environment variable
-    let serviceAccount;
-    try {
-      // Try to parse as JSON first
-      serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
-    } catch (e) {
-      // If JSON parsing fails, try base64 decoding first
-      try {
-        const decoded = Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY, 'base64').toString('utf8');
-        serviceAccount = JSON.parse(decoded);
-        console.log("🔑 Decoded base64 Google service account");
-      } catch (e2) {
-        throw new Error('Invalid GOOGLE_SERVICE_ACCOUNT_KEY format. Must be JSON or base64 encoded JSON.');
-      }
-    }
-
-    // Create temporary credentials file only if it doesn't exist
-    const tempCredentialsPath = path.join(
-      __dirname,
-      "../../temp-credentials.json"
-    );
-    const fs = require("fs");
-
-    if (!fs.existsSync(tempCredentialsPath)) {
-      fs.writeFileSync(tempCredentialsPath, JSON.stringify(serviceAccount));
-      console.log("🔑 Created temporary credentials file");
-    }
-
-    process.env.GOOGLE_APPLICATION_CREDENTIALS = tempCredentialsPath;
-    console.log("🔑 Using service account from environment variables");
-  } else {
-    // Fallback to service account file (for local development)
-    const serviceAccountPath = path.join(
-      __dirname,
-      "../../config/service-account.json"
-    );
-    process.env.GOOGLE_APPLICATION_CREDENTIALS = serviceAccountPath;
-    console.log("🔑 Using service account file:", serviceAccountPath);
+  // Use API key instead of service account for more reliable authentication
+  const apiKey = process.env.GEMINI_API_KEY;
+  
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY not found in environment variables");
   }
 
+  console.log("🔑 Using Gemini API key for Vertex AI");
   console.log("🏢 Project ID:", projectId);
   console.log("📍 Location:", location);
 
+  // Initialize with API key - more reliable than service account
   genAI = new GoogleGenAI({
-    vertexai: true,
-    project: projectId,
-    location: location,
+    apiKey: apiKey,
+    // Note: When using API key, some Vertex AI features might be limited
+    // but basic Gemini functionality will work reliably
   });
 
-  console.log("✅ Google GenAI with Vertex AI initialized successfully");
-  console.log(
-    "🍎 Food Analysis Model (Text): gemini-2.0-flash-exp (latest experimental model)"
-  );
-  console.log(
-    "📸 Image Analysis Model: gemini-2.0-flash-exp (advanced multimodal analysis)"
-  );
-  console.log("🏢 Project:", projectId);
-  console.log("📍 Location:", location);
+  console.log("✅ Google GenAI initialized successfully with API key");
+  console.log("🍎 Food Analysis Model (Text): gemini-2.0-flash-exp");
+  console.log("📸 Image Analysis Model: gemini-2.0-flash-exp");
+  console.log("🔑 Authentication: API Key (more reliable than service account)");
 } catch (error) {
   console.error("❌ Failed to initialize Google GenAI:", error);
-  console.error("❌ Make sure service account is properly configured");
+  console.error("❌ Make sure GEMINI_API_KEY is set in environment variables");
 }
 
 // Convert buffer to base64 data URL for GenAI
@@ -1140,7 +1102,7 @@ Please provide a helpful, personalized response to the user's message.`;
       },
     });
 
-    const text = response.response.text();
+    const text = response.text;
     console.log("📝 Chat response received from Google GenAI");
 
     if (text && text.trim()) {
@@ -1169,10 +1131,75 @@ Please provide a helpful, personalized response to the user's message.`;
   }
 };
 
+// Generate simple chat response for health advisor
+const generateChatResponse = async (prompt) => {
+  try {
+    if (!genAI) {
+      throw new Error("Google GenAI not initialized");
+    }
+
+    console.log("🔄 Generating chat response with Google GenAI Vertex AI...");
+
+    const response = await genAI.models.generateContent({
+      model: "gemini-2.0-flash-exp",
+      contents: prompt,
+      generationConfig: {
+        maxOutputTokens: 1024,
+        temperature: 0.3,
+        topP: 0.8,
+        topK: 40,
+      },
+    });
+
+    const text = response.text;
+    console.log("✅ Chat response generated successfully");
+    return text.trim();
+  } catch (error) {
+    console.error("Error generating chat response:", error);
+    throw error;
+  }
+};
+
+// Simple chat response using EXACT same API call as analyzeFoodByName
+const generateSimpleChatResponse = async (message) => {
+  try {
+    if (!genAI) {
+      throw new Error("Google GenAI not initialized");
+    }
+
+    console.log(
+      "🔄 Generating simple chat response with Google GenAI Vertex AI..."
+    );
+    console.log("💬 Message:", message);
+
+    const prompt = `Answer this health/nutrition question briefly: "${message}"`;
+
+    const response = await genAI.models.generateContent({
+      model: "gemini-2.0-flash-exp",
+      contents: prompt,
+      generationConfig: {
+        maxOutputTokens: 200,
+        temperature: 0.3,
+        topP: 0.8,
+        topK: 40,
+      },
+    });
+
+    const text = response.text;
+    console.log("✅ Simple chat response generated successfully");
+    return text.trim();
+  } catch (error) {
+    console.error("❌ Error generating simple chat response:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   analyzeFoodImage,
   analyzeFoodByName,
   generateHealthyRecipe,
   generateDailyDietPlan,
   chatWithNutritionist,
+  generateChatResponse,
+  generateSimpleChatResponse,
 };

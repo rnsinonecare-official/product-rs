@@ -15,6 +15,7 @@ const healthMetricsRoutes = require("./routes/health");
 const aiRoutes = require("./routes/ai");
 const userRoutes = require("./routes/user");
 const adminRoutes = require("./routes/admin");
+const healthAdvisorRoutes = require("./routes/healthAdvisor");
 // const tempIntakeRoutes = require('./routes/tempIntake'); // Removed - using Firestore directly
 
 // Import middleware
@@ -46,6 +47,7 @@ app.use("/api/", limiter);
 // CORS configuration
 const corsOptions = {
   origin: [
+    "http://localhost:3000", // Always allow localhost for development
     process.env.FRONTEND_URL || "http://localhost:3000",
     "https://rainscareadmin.vercel.app",
     "http://localhost:3001",
@@ -167,12 +169,11 @@ app.use("/api/recipes", authMiddleware, recipeRoutes);
 app.use("/api/health", authMiddleware, healthMetricsRoutes);
 app.use("/api/ai", authMiddleware, aiRoutes);
 app.use("/api/user", authMiddleware, userRoutes);
+app.use("/api/health-advisor", authMiddleware, healthAdvisorRoutes);
 
 // Protect admin management endpoints with adminAuth middleware
 app.use("/api/admin", adminAuth, adminRoutes);
 // app.use('/api/temp-intake', authMiddleware, tempIntakeRoutes); // Removed - using Firestore directly
-
-
 
 // Public endpoint for updates
 app.get("/api/updates/active", async (req, res) => {
@@ -211,7 +212,7 @@ app.get("/api/updates/active", async (req, res) => {
 });
 
 // Public endpoints for blogs
-const blogService = require('./services/blogService');
+const blogService = require("./services/blogService");
 
 app.get("/api/blogs", async (req, res) => {
   try {
@@ -227,7 +228,7 @@ app.get("/api/blogs/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const blog = await blogService.getBlogById(id);
-    
+
     if (!blog) {
       return res.status(404).json({ error: "Blog not found" });
     }

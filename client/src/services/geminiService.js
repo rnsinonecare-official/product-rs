@@ -472,30 +472,23 @@ export const getNutritionAdvice = async (
 };
 
 // Generate chatbot response for health and nutrition questions
-export const generateChatbotResponse = async (message, userContext = {}) => {
+export const generateChatbotResponse = async (message, userContext = {}, conversationHistory = []) => {
   try {
-    console.log("🤖 Generating chatbot response via backend API");
+    console.log("🤖 Generating health advisor response via backend API");
+    console.log("📝 Message:", message);
 
-    const response = await api.post("/ai/chat", {
-      message,
-      context: userContext,
+    const response = await api.post("/health-advisor/chat", {
+      message
     });
 
+    console.log("✅ Health advisor response received:", response.data);
     return response.data.data.response;
   } catch (error) {
-    console.error("Error generating chatbot response:", error);
+    console.error("Error generating health advisor response:", error);
+    console.error("Error details:", error.response?.data || error.message);
 
-    // Fallback response
-    return {
-      response:
-        "I'm here to help with your health and nutrition questions! However, I'm having trouble processing your request right now. Please try asking about food nutrition, healthy recipes, or meal planning.",
-      suggestions: [
-        "Ask about nutrition facts for specific foods",
-        "Request healthy recipe suggestions",
-        "Get meal planning advice",
-        "Learn about foods for specific health conditions",
-      ],
-    };
+    // Simple fallback response
+    return "I'm sorry, I'm having technical difficulties right now. Please try asking your health question again, or consult with a healthcare professional for personalized advice.";
   }
 };
 
