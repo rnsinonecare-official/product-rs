@@ -21,7 +21,8 @@ import {
   Shield,
   Lock,
   Gem,
-  Crown
+  Crown,
+  BookOpen
 } from 'lucide-react';
 import rainscareLogo from '../../images/RAINSCARE WOB.png';
 
@@ -92,6 +93,7 @@ const Navigation = () => {
     { path: '/', label: 'Dashboard', icon: Home },
     { path: '/food-analysis', label: 'Food & Recipes', icon: Camera },
     { path: '/doctors', label: 'Doctors', icon: Heart },
+    { path: '/blogs', label: 'Blogs', icon: BookOpen },
     { path: '/unrevealed', label: 'Unrevealed', icon: Gem },
     { path: '/about', label: 'About Us', icon: Users },
   ];

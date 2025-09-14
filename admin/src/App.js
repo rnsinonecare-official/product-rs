@@ -9,6 +9,7 @@ import Announcements from './pages/Announcements';
 import Updates from './pages/Updates';
 import HealthTips from './pages/HealthTips';
 import SuccessStories from './pages/SuccessStories';
+import Blogs from './pages/Blogs';
 import Doctors from './pages/Doctors';
 import Users from './pages/Users';
 import Analytics from './pages/Analytics';
@@ -78,6 +79,7 @@ function App() {
               <Route path="/updates" element={<Updates />} />
               <Route path="/health-tips" element={<HealthTips />} />
               <Route path="/success-stories" element={<SuccessStories />} />
+              <Route path="/blogs" element={<Blogs />} />
               <Route path="/doctors" element={<Doctors />} />
               <Route path="/users" element={<Users />} />
               <Route path="/analytics" element={<Analytics />} />

@@ -26,6 +26,7 @@ const COLLECTIONS = {
   SUCCESS_STORIES: "successStories",
   DOCTORS: "doctors",
   UPDATES: "updates",
+  BLOGS: "blogs",
 };
 
 // Persistence functions for mock data
@@ -165,6 +166,116 @@ try {
         createdAt: new Date().toISOString(),
       },
     ],
+    blogs: [
+      {
+        id: "mock-blog-1",
+        title: "5 Healthy Habits for a Stronger Immune System",
+        author: "Jane Doe",
+        date: "2025-09-10",
+        category: "Health",
+        tags: ["immunity", "healthy living", "wellness"],
+        cover_image:
+          "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=400&fit=crop",
+        excerpt:
+          "Learn five simple daily habits that can naturally support your immune system.",
+        content:
+          "Taking care of your immune system doesn't have to be complicated. Here are five easy things you can do every day:\n\n1. **Eat Nutritious Foods**: Focus on whole foods rich in vitamins and minerals. Include plenty of fruits, vegetables, lean proteins, and whole grains in your diet.\n\n2. **Get Enough Sleep**: Aim for 7-9 hours of quality sleep each night. Sleep is when your body repairs and regenerates immune cells.\n\n3. **Stay Hydrated**: Drink at least 8 glasses of water daily. Proper hydration helps your body flush out toxins and maintain optimal function.\n\n4. **Exercise Regularly**: Moderate exercise boosts immune function. Aim for at least 30 minutes of physical activity most days of the week.\n\n5. **Manage Stress**: Chronic stress weakens your immune system. Practice relaxation techniques like meditation, deep breathing, or yoga.\n\nThese simple habits can make a significant difference in your overall health and well-being. Start with one habit and gradually incorporate the others into your daily routine.",
+        related_posts: ["mock-blog-2", "mock-blog-3"],
+        isActive: true,
+        createdAt: new Date(Date.now() - 86400000).toISOString(),
+        views: 127,
+      },
+      {
+        id: "mock-blog-2",
+        title: "The Ultimate Guide to Home Workouts",
+        author: "Mike Johnson",
+        date: "2025-09-08",
+        category: "Fitness",
+        tags: ["home workout", "exercise", "fitness", "strength training"],
+        cover_image:
+          "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=400&fit=crop",
+        excerpt:
+          "Transform your living space into a personal gym with these effective home workout routines.",
+        content:
+          "Working out at home has never been more popular or accessible. Here's your complete guide to creating an effective home fitness routine:\n\n**Getting Started**\nYou don't need expensive equipment to get a great workout at home. Your body weight provides plenty of resistance for building strength and endurance.\n\n**Essential Bodyweight Exercises:**\n- Push-ups (chest, shoulders, triceps)\n- Squats (legs, glutes)\n- Lunges (legs, balance)\n- Planks (core strength)\n- Burpees (full body cardio)\n\n**Creating Your Routine**\n1. Warm up for 5-10 minutes\n2. Perform 3-4 exercises for 3 sets each\n3. Rest 30-60 seconds between sets\n4. Cool down with stretching\n\n**Weekly Schedule**\n- Monday: Upper body focus\n- Tuesday: Cardio/HIIT\n- Wednesday: Lower body focus\n- Thursday: Core and flexibility\n- Friday: Full body circuit\n- Weekend: Active recovery (walking, yoga)\n\nConsistency is key. Start with 20-30 minute sessions and gradually increase duration and intensity as you build fitness.",
+        related_posts: ["mock-blog-1", "mock-blog-4"],
+        isActive: true,
+        createdAt: new Date(Date.now() - 172800000).toISOString(),
+        views: 89,
+      },
+      {
+        id: "mock-blog-3",
+        title: "Nutrition 101: Building a Balanced Meal Plan",
+        author: "Dr. Sarah Wilson",
+        date: "2025-09-06",
+        category: "Nutrition",
+        tags: ["nutrition", "meal planning", "healthy eating", "diet"],
+        cover_image:
+          "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=400&fit=crop",
+        excerpt:
+          "Master the art of meal planning with this comprehensive guide to balanced nutrition.",
+        content:
+          "Creating a balanced meal plan doesn't have to be complicated. Follow these evidence-based principles for optimal nutrition:\n\n**The Balanced Plate Method**\n- 1/2 plate: Non-starchy vegetables (broccoli, spinach, peppers)\n- 1/4 plate: Lean protein (chicken, fish, tofu, legumes)\n- 1/4 plate: Complex carbohydrates (quinoa, brown rice, sweet potato)\n- Add healthy fats (avocado, nuts, olive oil)\n\n**Macronutrient Breakdown**\n- Carbohydrates: 45-65% of total calories\n- Protein: 10-35% of total calories\n- Fats: 20-35% of total calories\n\n**Meal Planning Tips**\n1. Plan your meals weekly\n2. Prep ingredients in advance\n3. Include variety to prevent boredom\n4. Listen to your hunger cues\n5. Stay hydrated throughout the day\n\n**Sample Day**\n- Breakfast: Oatmeal with berries and nuts\n- Lunch: Quinoa salad with grilled chicken\n- Snack: Greek yogurt with fruit\n- Dinner: Baked salmon with roasted vegetables\n\nRemember, the best diet is one you can maintain long-term. Focus on progress, not perfection.",
+        related_posts: ["mock-blog-1", "mock-blog-5"],
+        isActive: true,
+        createdAt: new Date(Date.now() - 259200000).toISOString(),
+        views: 156,
+      },
+      {
+        id: "mock-blog-4",
+        title: "Mental Health and Wellness: A Holistic Approach",
+        author: "Dr. Emily Chen",
+        date: "2025-09-04",
+        category: "Mental Health",
+        tags: ["mental health", "wellness", "mindfulness", "stress management"],
+        cover_image:
+          "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop",
+        excerpt:
+          "Discover practical strategies for maintaining mental wellness in today's fast-paced world.",
+        content:
+          "Mental health is just as important as physical health. Here's how to nurture your mental wellness:\n\n**Understanding Mental Wellness**\nMental wellness involves emotional, psychological, and social well-being. It affects how we think, feel, and act in daily life.\n\n**Key Strategies for Mental Health**\n\n1. **Practice Mindfulness**\n   - Daily meditation (even 5 minutes helps)\n   - Deep breathing exercises\n   - Present-moment awareness\n\n2. **Build Strong Relationships**\n   - Maintain social connections\n   - Communicate openly with loved ones\n   - Seek support when needed\n\n3. **Establish Healthy Boundaries**\n   - Learn to say no\n   - Limit social media exposure\n   - Create work-life balance\n\n4. **Engage in Meaningful Activities**\n   - Pursue hobbies you enjoy\n   - Volunteer for causes you care about\n   - Set achievable goals\n\n**Warning Signs to Watch For**\n- Persistent sadness or anxiety\n- Changes in sleep or appetite\n- Difficulty concentrating\n- Loss of interest in activities\n\nRemember, seeking professional help is a sign of strength, not weakness. Mental health professionals can provide valuable tools and support.",
+        related_posts: ["mock-blog-2", "mock-blog-6"],
+        isActive: true,
+        createdAt: new Date(Date.now() - 345600000).toISOString(),
+        views: 203,
+      },
+      {
+        id: "mock-blog-5",
+        title: "Hydration: The Foundation of Good Health",
+        author: "Lisa Martinez",
+        date: "2025-09-02",
+        category: "Health",
+        tags: ["hydration", "water", "health", "wellness"],
+        cover_image:
+          "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=400&fit=crop",
+        excerpt:
+          "Understanding the critical role of proper hydration in maintaining optimal health and performance.",
+        content:
+          "Water is essential for life, yet many people don't drink enough. Here's everything you need to know about proper hydration:\n\n**Why Hydration Matters**\n- Regulates body temperature\n- Transports nutrients to cells\n- Removes waste products\n- Lubricates joints\n- Maintains blood pressure\n\n**How Much Water Do You Need?**\nThe general recommendation is 8 glasses (64 ounces) per day, but individual needs vary based on:\n- Activity level\n- Climate\n- Overall health\n- Pregnancy or breastfeeding\n\n**Signs of Proper Hydration**\n- Light yellow urine\n- Moist lips and mouth\n- Elastic skin\n- Stable energy levels\n\n**Hydration Tips**\n1. Start your day with a glass of water\n2. Keep a water bottle with you\n3. Eat water-rich foods (cucumbers, watermelon)\n4. Set reminders to drink water\n5. Monitor your urine color\n\n**Beyond Plain Water**\n- Herbal teas count toward fluid intake\n- Fruits and vegetables provide hydration\n- Limit caffeine and alcohol (they can be dehydrating)\n\n**Special Considerations**\nIncrease water intake during:\n- Exercise\n- Hot weather\n- Illness (fever, vomiting, diarrhea)\n- Air travel\n\nProper hydration is one of the simplest yet most effective ways to support your health.",
+        related_posts: ["mock-blog-1", "mock-blog-3"],
+        isActive: true,
+        createdAt: new Date(Date.now() - 432000000).toISOString(),
+        views: 94,
+      },
+      {
+        id: "mock-blog-6",
+        title: "Sleep Optimization: Your Guide to Better Rest",
+        author: "Dr. Robert Kim",
+        date: "2025-08-31",
+        category: "Health",
+        tags: ["sleep", "rest", "recovery", "health"],
+        cover_image:
+          "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=800&h=400&fit=crop",
+        excerpt:
+          "Unlock the secrets to quality sleep and wake up refreshed every morning.",
+        content:
+          "Quality sleep is crucial for physical health, mental well-being, and overall performance. Here's how to optimize your sleep:\n\n**Understanding Sleep Cycles**\nSleep occurs in cycles of about 90 minutes, including:\n- Light sleep (stages 1-2)\n- Deep sleep (stage 3)\n- REM sleep (dreaming stage)\n\n**Sleep Hygiene Basics**\n\n1. **Consistent Schedule**\n   - Go to bed and wake up at the same time daily\n   - Maintain schedule even on weekends\n\n2. **Create a Sleep Environment**\n   - Keep bedroom cool (65-68°F)\n   - Use blackout curtains or eye mask\n   - Minimize noise or use white noise\n   - Invest in a comfortable mattress and pillows\n\n3. **Pre-Sleep Routine**\n   - Wind down 1 hour before bed\n   - Avoid screens (blue light disrupts melatonin)\n   - Try reading, gentle stretching, or meditation\n   - Take a warm bath or shower\n\n**What to Avoid**\n- Caffeine after 2 PM\n- Large meals close to bedtime\n- Alcohol (disrupts sleep quality)\n- Intense exercise within 3 hours of sleep\n\n**Natural Sleep Aids**\n- Chamomile tea\n- Magnesium supplements\n- Lavender aromatherapy\n- Progressive muscle relaxation\n\n**When to Seek Help**\nConsult a healthcare provider if you experience:\n- Chronic insomnia\n- Loud snoring\n- Daytime fatigue despite adequate sleep\n- Difficulty staying asleep\n\nRemember, good sleep is not a luxury—it's a necessity for optimal health and well-being.",
+        related_posts: ["mock-blog-1", "mock-blog-4"],
+        isActive: true,
+        createdAt: new Date(Date.now() - 518400000).toISOString(),
+        views: 178,
+      },
+    ],
   };
 
   // Save initial data
@@ -207,14 +318,14 @@ router.get(
       console.error("Error fetching announcements:", error);
 
       // Handle all Firestore connection errors with mock data
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
-        console.log(
-          "Firestore connection issue, returning stored mock data"
-        );
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
+        console.log("Firestore connection issue, returning stored mock data");
         res.json(
           mockStorage.announcements.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -258,11 +369,13 @@ router.post(
     } catch (error) {
       console.error("Error creating announcement:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Firestore write not accessible, storing announcement in memory"
         );
@@ -310,11 +423,13 @@ router.put(
     } catch (error) {
       console.error("Error updating announcement:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log("Firestore update not accessible, updating in memory");
 
         const announcementIndex = mockStorage.announcements.findIndex(
@@ -353,11 +468,13 @@ router.delete(
     } catch (error) {
       console.error("Error deleting announcement:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log("Firestore delete not accessible, deleting from memory");
 
         const announcementIndex = mockStorage.announcements.findIndex(
@@ -396,11 +513,13 @@ router.get(
     } catch (error) {
       console.error("Error fetching health tips:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Health tips collection not accessible, returning stored mock data"
         );
@@ -452,11 +571,13 @@ router.post(
     } catch (error) {
       console.error("Error creating health tip:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Firestore write not accessible, storing health tip in memory"
         );
@@ -500,11 +621,13 @@ router.put(
     } catch (error) {
       console.error("Error updating health tip:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Firestore update not accessible, updating health tip in memory"
         );
@@ -546,11 +669,13 @@ router.delete(
     } catch (error) {
       console.error("Error deleting health tip:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Firestore delete not accessible, deleting health tip from memory"
         );
@@ -593,11 +718,13 @@ router.get(
     } catch (error) {
       console.error("Error fetching success stories:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Success stories collection not accessible, returning stored mock data"
         );
@@ -651,11 +778,13 @@ router.post(
     } catch (error) {
       console.error("Error creating success story:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Firestore write not accessible, storing success story in memory"
         );
@@ -703,11 +832,13 @@ router.put(
     } catch (error) {
       console.error("Error updating success story:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Firestore update not accessible, updating success story in memory"
         );
@@ -749,11 +880,13 @@ router.delete(
     } catch (error) {
       console.error("Error deleting success story:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Firestore delete not accessible, deleting success story from memory"
         );
@@ -794,11 +927,13 @@ router.get(
     } catch (error) {
       console.error("Error fetching updates:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Updates collection not accessible, returning stored mock data"
         );
@@ -847,11 +982,13 @@ router.post(
     } catch (error) {
       console.error("Error creating update:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log("Firestore write not accessible, storing update in memory");
 
         const mockUpdate = {
@@ -891,11 +1028,13 @@ router.put(
     } catch (error) {
       console.error("Error updating update:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Firestore update not accessible, updating update in memory"
         );
@@ -937,11 +1076,13 @@ router.delete(
     } catch (error) {
       console.error("Error deleting update:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Firestore delete not accessible, deleting update from memory"
         );
@@ -982,11 +1123,13 @@ router.get(
     } catch (error) {
       console.error("Error fetching doctors:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Doctors collection not accessible, returning stored mock data"
         );
@@ -1047,11 +1190,13 @@ router.post(
     } catch (error) {
       console.error("Error creating doctor:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log("Firestore write not accessible, storing doctor in memory");
 
         const mockDoctor = {
@@ -1093,11 +1238,13 @@ router.put(
     } catch (error) {
       console.error("Error updating doctor:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Firestore update not accessible, updating doctor in memory"
         );
@@ -1139,11 +1286,13 @@ router.delete(
     } catch (error) {
       console.error("Error deleting doctor:", error);
 
-      if (error.code === 7 || 
-          error.message.includes("PERMISSION_DENIED") ||
-          error.message.includes("DECODER routines") ||
-          error.message.includes("Getting metadata from plugin failed") ||
-          error.code === 2) {
+      if (
+        error.code === 7 ||
+        error.message.includes("PERMISSION_DENIED") ||
+        error.message.includes("DECODER routines") ||
+        error.message.includes("Getting metadata from plugin failed") ||
+        error.code === 2
+      ) {
         console.log(
           "Firestore delete not accessible, deleting doctor from memory"
         );
@@ -1895,7 +2044,7 @@ router.get(
     try {
       // Provide realistic dashboard stats based on your actual user base
       // Since we have Firestore permission issues, return meaningful stats
-      
+
       const stats = {
         totalUsers: 1247,
         activeUsers: 892,
@@ -1906,9 +2055,9 @@ router.get(
         weeklyGrowth: 12.5,
         contentViews: 45678,
         errorRate: 0.1,
-        systemUptime: '99.9%',
+        systemUptime: "99.9%",
         foodEntriesGrowth: 8.3,
-        systemStatus: 'operational'
+        systemStatus: "operational",
       };
 
       res.json(stats);
@@ -1920,3 +2069,126 @@ router.get(
 );
 
 module.exports = router;
+
+// ==================== BLOGS ====================
+
+const blogService = require('../services/blogService');
+
+// Get all blogs
+router.get(
+  "/blogs",
+  asyncHandler(async (req, res) => {
+    try {
+      const blogs = await blogService.getAllBlogsForAdmin();
+      res.json(blogs);
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+      res.status(500).json({ error: "Failed to fetch blogs" });
+    }
+  })
+);
+
+// Get single blog by ID
+router.get(
+  "/blogs/:id",
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const blog = await blogService.getBlogById(id);
+      
+      if (!blog) {
+        return res.status(404).json({ error: "Blog not found" });
+      }
+
+      res.json(blog);
+    } catch (error) {
+      console.error("Error fetching blog:", error);
+      res.status(500).json({ error: "Failed to fetch blog" });
+    }
+  })
+);
+
+// Create blog
+router.post(
+  "/blogs",
+  asyncHandler(async (req, res) => {
+    try {
+      const {
+        title,
+        author,
+        category,
+        tags = [],
+        cover_image = "https://static.vecteezy.com/system/resources/previews/035/947/339/non_2x/blog-3d-illustration-icon-png.png",
+        excerpt,
+        content,
+        related_posts = [],
+        isActive = true,
+      } = req.body;
+
+      if (!title || !content || !author) {
+        return res.status(400).json({
+          error: "Title, content, and author are required",
+        });
+      }
+
+      const blogData = {
+        title,
+        author,
+        category: category || "General",
+        tags: Array.isArray(tags) ? tags : [],
+        cover_image,
+        excerpt: excerpt || content.substring(0, 150) + "...",
+        content,
+        related_posts: Array.isArray(related_posts) ? related_posts : [],
+        isActive,
+      };
+
+      const newBlog = await blogService.createBlog(blogData);
+      res.status(201).json(newBlog);
+    } catch (error) {
+      console.error("Error creating blog:", error);
+      res.status(500).json({ error: "Failed to create blog" });
+    }
+  })
+);
+
+// Update blog
+router.put(
+  "/blogs/:id",
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const updatedBlog = await blogService.updateBlog(id, req.body);
+      res.json(updatedBlog);
+    } catch (error) {
+      console.error("Error updating blog:", error);
+      if (error.message === 'Blog not found') {
+        res.status(404).json({ error: "Blog not found" });
+      } else {
+        res.status(500).json({ error: "Failed to update blog" });
+      }
+    }
+  })
+);
+
+// Delete blog
+router.delete(
+  "/blogs/:id",
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      await blogService.deleteBlog(id);
+      res.json({ message: "Blog deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+      if (error.message === 'Blog not found') {
+        res.status(404).json({ error: "Blog not found" });
+      } else {
+        res.status(500).json({ error: "Failed to delete blog" });
+      }
+    }
+  })
+);
