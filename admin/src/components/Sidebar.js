@@ -10,7 +10,8 @@ import {
   Users,
   BarChart3,
   Settings,
-  Activity
+  Activity,
+  BookOpen
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen }) => {
@@ -22,6 +23,7 @@ const Sidebar = ({ isOpen }) => {
     { path: '/updates', icon: Zap, label: 'Updates' },
     { path: '/health-tips', icon: Heart, label: 'Health Tips' },
     { path: '/success-stories', icon: Trophy, label: 'Success Stories' },
+    { path: '/blogs', icon: BookOpen, label: 'Blogs' },
     { path: '/doctors', icon: UserCheck, label: 'Doctors' },
     { path: '/users', icon: Users, label: 'Users' },
     { path: '/analytics', icon: BarChart3, label: 'Analytics' },

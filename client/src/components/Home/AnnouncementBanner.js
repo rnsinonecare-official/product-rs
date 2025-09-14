@@ -134,7 +134,7 @@ const AnnouncementBanner = () => {
                       <h3 className="font-semibold text-sm sm:text-base truncate">
                         {currentAnnouncement.title}
                       </h3>
-                      <p className="text-xs sm:text-sm opacity-90 truncate">
+                      <p className="text-xs sm:text-sm opacity-90 break-words line-clamp-2 sm:line-clamp-none">
                         {currentAnnouncement.content}
                       </p>
                     </motion.div>

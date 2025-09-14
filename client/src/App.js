@@ -17,6 +17,8 @@ import LoadingScreen from './components/LoadingScreen/LoadingScreen';
 // import FoodAnalysisRecipe from './components/FoodAnalysisRecipe/FoodAnalysisRecipe';
 import Doctors from './components/Nutritionist/Nutritionist';
 import NewsUpdates from './components/NewsUpdates/NewsUpdates';
+import Blogs from './components/Blogs/Blogs';
+import BlogPost from './components/Blogs/BlogPost';
 import Chatbot from './components/Chatbot/Chatbot';
 import TermsConditions from './components/TermsConditions/TermsConditions';
 import ProfileSettings from './components/Profile/ProfileSettings';
@@ -157,6 +159,8 @@ function AppContent() {
                       <Route path="/recipes" element={<RecipeGenerator />} />
                       <Route path="/doctors" element={<Doctors />} />
                       <Route path="/news" element={<NewsUpdates />} />
+                      <Route path="/blogs" element={<Blogs />} />
+                      <Route path="/blog/:id" element={<BlogPost />} />
                       <Route path="/progress" element={<ProgressTracker />} />
                       <Route path="/community" element={<Community />} />
                       <Route path="/profile" element={<ProfileSettings />} />

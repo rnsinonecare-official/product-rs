@@ -207,6 +207,35 @@ app.get("/api/updates/active", async (req, res) => {
   }
 });
 
+// Public endpoints for blogs
+const blogService = require('./services/blogService');
+
+app.get("/api/blogs", async (req, res) => {
+  try {
+    const blogs = await blogService.getAllBlogs();
+    res.json(blogs);
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    res.status(500).json({ error: "Failed to fetch blogs" });
+  }
+});
+
+app.get("/api/blogs/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const blog = await blogService.getBlogById(id);
+    
+    if (!blog) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
+
+    res.json(blog);
+  } catch (error) {
+    console.error("Error fetching blog:", error);
+    res.status(500).json({ error: "Failed to fetch blog" });
+  }
+});
+
 // 404 handler
 app.use("*", (req, res) => {
   res.status(404).json({
