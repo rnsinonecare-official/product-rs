@@ -867,34 +867,6 @@ const FoodAnalysis = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            {/* Debug Test Button */}
-            <motion.button
-              onClick={() => {
-                console.log("🧪 Testing modal with dummy data");
-                setAiAnalysisResult({
-                  foodName: "Test Food",
-                  calories: "100 calories",
-                  healthScore: 8,
-                  isHealthy: true,
-                  nutritionFacts: {
-                    protein: "5g",
-                    carbs: "20g",
-                    fat: "2g",
-                    fiber: "3g",
-                    sodium: "50mg",
-                  },
-                  recommendation: "This is a test recommendation",
-                  healthWarnings: [],
-                  healthBenefits: ["Test benefit"],
-                });
-                setShowAiModal(true);
-                console.log("🧪 Modal should be visible now");
-              }}
-              className="bg-purple-500 text-white px-4 py-2 rounded-xl text-sm"
-            >
-              🧪 Test Modal
-            </motion.button>
-
             <motion.button
               onClick={() => handleAiAnalysis(searchTerm)}
               disabled={isAnalyzing || !searchTerm.trim()}
