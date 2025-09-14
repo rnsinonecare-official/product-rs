@@ -1,0 +1,490 @@
+/* Doctor Cards Alignment Styles */
+.doctor-card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.doctor-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.doctor-card-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.doctor-card-buttons {
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+/* Line clamp utilities for text truncation */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Consultation mode selection styles */
+.consultation-mode-card {
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.consultation-mode-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.consultation-mode-card.selected {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+/* Online consultation type buttons */
+.consultation-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.consultation-type-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: white;
+}
+
+.consultation-type-button:hover {
+  border-color: #3b82f6;
+  transform: scale(1.02);
+}
+
+.consultation-type-button.selected {
+  border-color: #3b82f6;
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* Clinic address info box */
+.clinic-info-box {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+/* Container Styles */
+.nutritionist-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  gap: 2rem;
+}
+
+/* Search Bar Styles */
+.search-bar {
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+  margin: 1rem 0;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 12px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 25px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.search-bar input:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Grid Layout */
+.nutritionist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* Card Styles */
+.nutritionist-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.nutritionist-card:hover {
+  transform: translateY(-5px);
+}
+
+.nutritionist-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.nutritionist-info {
+  padding: 1.5rem;
+}
+
+.nutritionist-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.nutritionist-specialty {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.nutritionist-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ffa41b;
+}
+
+.rating-stars {
+  color: #ffd700;
+}
+
+/* Button Styles */
+.view-profile-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.view-profile-btn:hover {
+  background-color: #45a049;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .doctor-card-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .consultation-type-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .consultation-mode-card {
+    text-align: center;
+  }
+
+  .nutritionist-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .nutritionist-container {
+    padding: 1rem;
+  }
+
+  .search-bar {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .nutritionist-card {
+    margin: 0 1rem;
+  }
+
+  .nutritionist-info {
+    padding: 1rem;
+  }
+
+  .nutritionist-name {
+    font-size: 1.1rem;
+  }
+}
+
+/* Animation for modal appearance */
+.booking-modal-overlay {
+  backdrop-filter: blur(4px);
+}
+
+.booking-modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Custom scrollbar for modal */
+.booking-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.booking-modal-content::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.booking-modal-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.booking-modal-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Fix for DatePicker and form input text visibility */
+.react-datepicker__input-container input {
+  color: #1f2937 !important; /* gray-800 */
+  background-color: white !important;
+}
+
+.react-datepicker__input-container input::placeholder {
+  color: #6b7280 !important; /* gray-500 */
+  opacity: 1 !important;
+}
+
+/* Ensure all form inputs in booking modal have proper text color */
+.booking-modal-content input,
+.booking-modal-content textarea,
+.booking-modal-content select {
+  color: #1f2937 !important; /* gray-800 */
+  background-color: white !important;
+}
+
+.booking-modal-content input::placeholder,
+.booking-modal-content textarea::placeholder {
+  color: #6b7280 !important; /* gray-500 */
+  opacity: 1 !important;
+}
+
+/* Fix for DatePicker focus state */
+.react-datepicker__input-container input:focus {
+  color: #1f2937 !important;
+  background-color: white !important;
+}
+
+/* DatePicker calendar styling */
+.react-datepicker {
+  font-family: 'Poppins', system-ui, sans-serif;
+  border: 1px solid #d1d5db;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.react-datepicker__header {
+  background-color: #9CAF88;
+  border-bottom: 1px solid #d1d5db;
+  border-radius: 1rem 1rem 0 0;
+}
+
+.react-datepicker__current-month {
+  color: white;
+  font-weight: 600;
+}
+
+.react-datepicker__day-name {
+  color: white;
+  font-weight: 500;
+}
+
+.react-datepicker__day {
+  color: #374151;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.react-datepicker__day:hover {
+  background-color: #9CAF88;
+  color: white;
+}
+
+.react-datepicker__day--selected {
+  background-color: #9CAF88 !important;
+  color: white !important;
+}
+
+.react-datepicker__day--keyboard-selected {
+  background-color: #9CAF88;
+  color: white;
+}
+
+/* Additional fix for any remaining white text issues */
+.booking-modal-content * {
+  color: inherit;
+}
+
+.booking-modal-content input[type="text"],
+.booking-modal-content input[type="email"],
+.booking-modal-content input[type="tel"],
+.booking-modal-content input[type="number"],
+.booking-modal-content textarea,
+.booking-modal-content select {
+  color: #1f2937 !important;
+  background-color: white !important;
+  -webkit-text-fill-color: #1f2937 !important;
+}
+
+/* Fix for button text in unselected state */
+.booking-modal-content button:not(.bg-blue-500):not(.bg-sage) {
+  color: #374151 !important;
+}
+
+/* Fix for time slot buttons */
+.booking-modal-content .grid button {
+  color: #374151 !important;
+}
+
+.booking-modal-content .grid button.border-sage {
+  color: #000000 !important;
+}
+
+/* Fix for consultation mode buttons */
+.booking-modal-content .consultation-mode-card:not(.selected) {
+  color: #374151 !important;
+}
+
+/* Fix for online consultation type buttons */
+.booking-modal-content .consultation-type-button:not(.selected) {
+  color: #374151 !important;
+}
+
+/* Ensure proper text color inheritance */
+.booking-modal-content .text-gray-700 {
+  color: #374151 !important;
+}
+
+.booking-modal-content .text-gray-800 {
+  color: #1f2937 !important;
+}
+
+.booking-modal-content .text-gray-600 {
+  color: #4b5563 !important;
+}
+
+/* Fix for select options */
+.booking-modal-content select option {
+  color: #1f2937 !important;
+  background-color: white !important;
+}
+
+/* Comprehensive fix for all text elements in booking modal */
+.booking-modal-content {
+  color: #1f2937;
+}
+
+.booking-modal-content label {
+  color: #374151 !important;
+}
+
+.booking-modal-content h2,
+.booking-modal-content h3,
+.booking-modal-content h4 {
+  color: #1f2937 !important;
+}
+
+.booking-modal-content p {
+  color: #4b5563 !important;
+}
+
+/* Override any conflicting styles */
+.booking-modal-content * {
+  -webkit-text-fill-color: initial !important;
+}
+
+.booking-modal-content input,
+.booking-modal-content textarea,
+.booking-modal-content select {
+  -webkit-text-fill-color: #1f2937 !important;
+}
+
+/* Fix for motion buttons that might lose text color */
+.booking-modal-content .motion-button {
+  color: inherit !important;
+}
+
+/* Ensure icons are visible */
+.booking-modal-content svg {
+  color: currentColor !important;
+}
+
+/* Loading State */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* Error State */
+.error-message {
+  color: #ff4444;
+  text-align: center;
+  padding: 1rem;
+  background-color: #ffe6e6;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nutritionist-card {
+  animation: fadeIn 0.5s ease-out;
+}

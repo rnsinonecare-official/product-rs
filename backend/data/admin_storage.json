@@ -1,0 +1,76 @@
+{
+  "announcements": [
+    {
+      "id": "mock-1",
+      "title": "Welcome to Rainscare Admin Panel",
+      "content": "Your admin panel is now operational. This is mock data while Firestore permissions are being configured.",
+      "isActive": true,
+      "priority": 1,
+      "createdAt": "2025-09-12T18:14:14.145Z",
+      "views": 0
+    }
+  ],
+  "healthTips": [
+    {
+      "id": "mock-tip-1",
+      "title": "Stay Hydrated",
+      "content": "Drink at least 8 glasses of water daily to maintain good health.",
+      "category": "General Health",
+      "isActive": true,
+      "createdAt": "2025-09-12T18:14:14.146Z",
+      "views": 0
+    }
+  ],
+  "successStories": [
+    {
+      "id": "mock-story-1757704148656",
+      "title": "hh",
+      "content": "hh",
+      "author": "Anonymous User",
+      "isActive": true,
+      "featured": false,
+      "createdAt": "2025-09-12T19:09:08.656Z",
+      "likes": 0
+    },
+    {
+      "id": "mock-story-1",
+      "title": "My Health Journey",
+      "content": "Thanks to the health tips, I've improved my daily routine significantly.",
+      "author": "Anonymous User",
+      "isActive": true,
+      "featured": false,
+      "createdAt": "2025-09-12T18:14:14.146Z",
+      "likes": 5
+    }
+  ],
+  "doctors": [
+    {
+      "id": "mock-doctor-1",
+      "name": "Dr. Sample",
+      "specialty": "General Medicine",
+      "email": "sample@example.com",
+      "phone": "+1234567890",
+      "isActive": true,
+      "createdAt": "2025-09-12T18:14:14.146Z",
+      "specialization": "Nutritionist",
+      "experience": "5",
+      "updatedAt": "2025-09-12T18:22:14.064Z"
+    }
+  ],
+  "updates": [
+    {
+      "id": "mock-update-1757830581165",
+      "title": "New Update Soon",
+      "content": "Version 1.4",
+      "isActive": true,
+      "createdAt": "2025-09-14T06:16:21.165Z"
+    },
+    {
+      "id": "mock-update-1757704595118",
+      "title": "HH",
+      "content": "HAA",
+      "isActive": true,
+      "createdAt": "2025-09-12T19:16:35.118Z"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "name": "rainscare-full-stack",
+  "version": "1.0.0",
+  "description": "Complete Rainscare application with backend, frontend, and admin panel",
+  "main": "backend/src/server.js",
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "build": "node build.js",
+    "build:client": "cd client && npm install && npm run build",
+    "build:admin": "cd admin && npm install && npm run build",
+    "build:backend": "cd backend && npm install",
+    "vercel-build": "npm run build:backend && npm run build:client && npm run build:admin",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:client\" \"npm run dev:admin\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:client": "cd client && npm start",
+    "dev:admin": "cd admin && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../client && npm install && cd ../admin && npm install"
+  },
+  "keywords": [
+    "health",
+    "nutrition",
+    "food-analysis",
+    "react",
+    "node",
+    "firebase"
+  ],
+  "author": "Rainscare Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^6.12.0",
+    "@google-cloud/vertexai": "^1.10.0",
+    "@google/genai": "^1.15.0",
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.6.2",
+    "bcrypt": "^6.0.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "firebase-admin": "^13.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.0",
+    "sharp": "^0.33.5",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}

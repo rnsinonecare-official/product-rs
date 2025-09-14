@@ -1,0 +1,25 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Users can read and write to their own profile images
+    match /users/{userId}/profileImages/{imageId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Users can read and write to their own food images
+    match /users/{userId}/foodImages/{imageId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Public read access for shared recipes images
+    match /recipes/{recipeId}/images/{imageId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Default fallback rule for anything else (deny all)
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

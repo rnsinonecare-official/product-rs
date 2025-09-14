@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    
+    <!-- Browser theme color support -->
+    <!-- Chrome, Edge, and Safari support theme-color directly -->
+    <meta name="theme-color" content="#10b981" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d8f66" media="(prefers-color-scheme: dark)" />
+    
+    <!-- Firefox color scheme support (Firefox 89+) -->
+    <meta name="color-scheme" content="light dark" />
+    
+    <!-- Cross-browser enhanced styling -->
+    <style>
+      :root {
+        --theme-color: #10b981;
+        --theme-color-dark: #0d8f66;
+      }
+      
+      /* Common styling for all browsers */
+      body::before {
+        content: '';
+        display: block;
+        height: 3px;
+        background-color: var(--theme-color);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 9999;
+      }
+      
+      /* Dark mode support */
+      @media (prefers-color-scheme: dark) {
+        body::before {
+          background-color: var(--theme-color-dark);
+        }
+      }
+      
+      /* Firefox-specific adjustments can use feature detection instead */
+      @supports (-moz-appearance: none) {
+        /* Firefox-specific styles if needed */
+      }
+      
+      /* Webkit-specific adjustments (Chrome, Safari, newer Opera) */
+      @supports (-webkit-appearance: none) {
+        /* Webkit-specific styles if needed */
+      }
+    </style>
+    
+    <!-- Microsoft Edge and IE -->
+    <meta name="msapplication-navbutton-color" content="#10b981" />
+    
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="#10b981" />
+    <meta name="description" content="Rainscare - Your personalized health and nutrition companion. Track BMI, metabolic age, get rainscare-powered food analysis and personalized recipes." />
+    
+    <!-- Mobile Web App Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Rainscare" />
+    
+    <!-- Prevent zoom on input focus (iOS) -->
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.svg" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <title>Rainscare</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

@@ -1,0 +1,276 @@
+/* Onboarding Component Specific Styles */
+
+/* Fix PhoneInput text color */
+.PhoneInput input,
+.phone-input-field input {
+  color: #374151 !important; /* text-gray-700 */
+  font-weight: 500;
+}
+
+.PhoneInput input::placeholder,
+.phone-input-field input::placeholder {
+  color: #6b7280 !important; /* text-gray-500 */
+}
+
+/* Additional PhoneInput styling */
+.phone-input-field .PhoneInputInput {
+  color: #374151 !important;
+  font-weight: 500;
+  background-color: #ffffff;
+}
+
+.phone-input-field .PhoneInputCountrySelect {
+  color: #374151 !important;
+  background-color: #ffffff;
+}
+
+/* Ensure all form inputs have proper text color */
+.onboarding-form input,
+.onboarding-form select,
+.onboarding-form textarea {
+  color: #374151 !important; /* text-gray-700 */
+  font-weight: 500;
+}
+
+.onboarding-form input::placeholder,
+.onboarding-form select::placeholder,
+.onboarding-form textarea::placeholder {
+  color: #6b7280 !important; /* text-gray-500 */
+}
+
+/* Option elements in select dropdowns */
+.onboarding-form select option {
+  color: #374151 !important; /* text-gray-700 */
+  background-color: #ffffff;
+}
+
+/* Ensure text visibility in all form elements */
+.onboarding-form .form-input {
+  color: #374151 !important;
+}
+
+/* Fix any potential white text issues */
+.onboarding-form input:not([type="button"]):not([type="submit"]),
+.onboarding-form select,
+.onboarding-form textarea {
+  color: #374151 !important;
+}
+
+/* PhoneInput specific styling */
+.PhoneInputInput {
+  color: #374151 !important;
+  font-weight: 500;
+}
+
+.PhoneInputCountrySelect {
+  color: #374151 !important;
+}
+
+/* Address textarea if it exists */
+.onboarding-form textarea {
+  color: #374151 !important;
+  font-weight: 500;
+  resize: vertical;
+}
+
+/* Ensure proper contrast for all text inputs */
+.onboarding-container input[type="text"],
+.onboarding-container input[type="number"],
+.onboarding-container input[type="email"],
+.onboarding-container input[type="tel"],
+.onboarding-container select,
+.onboarding-container textarea {
+  color: #374151 !important;
+  font-weight: 500;
+}
+
+/* Fix any potential issues with react-phone-number-input */
+.PhoneInput .PhoneInputInput {
+  color: #374151 !important;
+  font-weight: 500;
+}
+
+.PhoneInput .PhoneInputCountrySelect {
+  color: #374151 !important;
+}
+
+/* Ensure dropdown options are visible */
+.PhoneInput .PhoneInputCountrySelect option {
+  color: #374151 !important;
+  background-color: #ffffff;
+}
+
+/* Fix button text visibility */
+.onboarding-form button {
+  color: #374151 !important;
+  font-weight: 600;
+}
+
+/* Selected button styling */
+.onboarding-form button.bg-sage {
+  color: #ffffff !important;
+}
+
+/* Unselected button styling */
+.onboarding-form button:not(.bg-sage) {
+  color: #374151 !important;
+  background-color: #ffffff;
+}
+
+/* Button hover states */
+.onboarding-form button:hover:not(.bg-sage) {
+  color: #059669 !important; /* sage color */
+  background-color: #f0fdf4; /* light green background */
+}
+
+/* Specific styling for selection buttons */
+.onboarding-form motion.button,
+.onboarding-form [role="button"] {
+  color: #374151 !important;
+  font-weight: 600;
+}
+
+/* Navigation buttons */
+.onboarding-form .animated-button {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Ensure all button text is visible */
+.onboarding-container button {
+  color: #374151 !important;
+  font-weight: 600;
+}
+
+.onboarding-container button.text-white,
+.onboarding-container button[class*="bg-sage"],
+.onboarding-container button[class*="bg-gradient"] {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Button spans and inner elements */
+.onboarding-container button span {
+  color: inherit !important;
+}
+
+/* Specific fix for condition and allergy buttons */
+.onboarding-form button span.inline-block {
+  font-weight: 600;
+}
+
+/* Selected state for condition buttons */
+.onboarding-form button span.bg-white {
+  color: #059669 !important; /* sage color */
+  font-weight: 700;
+}
+
+/* Additional fallback styling for all buttons */
+.onboarding-container button:not([class*="bg-gradient"]):not([class*="bg-sage"]):not([class*="bg-green"]) {
+  color: #374151 !important;
+  background-color: #ffffff;
+}
+
+/* Ensure button text is never invisible */
+.onboarding-container button * {
+  color: inherit;
+}
+
+/* Force visibility for any missed buttons */
+.onboarding-form motion-button,
+.onboarding-form [role="button"],
+.onboarding-container [type="button"] {
+  color: #374151 !important;
+}
+
+/* Selected state override */
+.onboarding-container [type="button"][class*="bg-sage"],
+.onboarding-container [type="button"][class*="border-sage"][class*="bg-sage"] {
+  color: #ffffff !important;
+}
+
+/* Hover state for unselected buttons */
+.onboarding-container [type="button"]:hover:not([class*="bg-sage"]) {
+  color: #059669 !important;
+  background-color: #f0fdf4 !important;
+}
+
+/* Ensure toggle switches are visible */
+.onboarding-container button[class*="rounded-full"] {
+  background-color: inherit;
+}
+
+/* Checkbox styling */
+.onboarding-container button[class*="w-5"][class*="h-5"] {
+  border: 2px solid #d1d5db;
+  background-color: #ffffff;
+}
+
+.onboarding-container button[class*="w-5"][class*="h-5"][class*="bg-sage"] {
+  background-color: #059669 !important;
+  border-color: #059669 !important;
+  color: #ffffff !important;
+}
+
+/* Back button styling - ensure consistent text color */
+.onboarding-container .back-button {
+  color: #4b5563 !important; /* gray-600 */
+  background-color: transparent !important;
+  border: none !important;
+  text-shadow: none !important;
+}
+
+.onboarding-container .back-button:hover:not(:disabled) {
+  color: #059669 !important; /* sage color */
+  background-color: rgba(5, 150, 105, 0.1) !important;
+}
+
+.onboarding-container .back-button:disabled {
+  color: #9ca3af !important; /* gray-400 */
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+}
+
+.onboarding-container .back-button svg {
+  color: inherit !important;
+}
+
+/* Force back button text visibility on all backgrounds */
+.onboarding-container .back-button,
+.onboarding-container .back-button * {
+  color: inherit !important;
+}
+
+/* Ensure back button is visible on any background */
+.back-button {
+  position: relative;
+  z-index: 10;
+}
+
+/* Override any conflicting styles */
+.onboarding-container button.back-button {
+  color: #4b5563 !important;
+}
+
+.onboarding-container button.back-button:hover:not(:disabled) {
+  color: #059669 !important;
+}
+
+.onboarding-container button.back-button:disabled {
+  color: #9ca3af !important;
+}
+
+/* Navigation buttons container */
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .navigation-buttons {
+    margin-top: 2rem;
+  }
+}
