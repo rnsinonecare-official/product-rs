@@ -8,7 +8,7 @@ GENERATE_SOURCEMAP=false
 DISABLE_ESLINT_PLUGIN=true
 
 # Admin Panel Configuration - Update with your backend Vercel URL
-REACT_APP_API_URL=https://your-backend-vercel-url.vercel.app/api
+REACT_APP_API_URL=https://rainscarebackend.vercel.app/api
 REACT_APP_ADMIN_API_KEY=rainscare_admin_key_2024
 
 # Firebase Configuration

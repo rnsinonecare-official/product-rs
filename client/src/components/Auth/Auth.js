@@ -415,7 +415,7 @@ const Auth = ({ onAuthSuccess }) => {
               {/* Admin Login Button */}
               <motion.button
                 onClick={() => {
-                  const adminUrl = process.env.REACT_APP_ADMIN_URL || 'http://localhost:3001';
+                  const adminUrl = process.env.REACT_APP_ADMIN_URL || 'https://rainscareadmin.vercel.app';
                   window.location.href = adminUrl; // Open separate Admin app (Login page will render there)
                 }}
                 className="w-full mt-3 border-2 border-blue-500 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 py-3 rounded-2xl font-semibold flex items-center justify-center space-x-2 hover:from-blue-100 hover:to-indigo-100 transition-all duration-300 shadow-lg hover:shadow-xl"
