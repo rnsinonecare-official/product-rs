@@ -171,8 +171,8 @@ const Chatbot = () => {
       
       // Create conversation history for context
       const conversationHistory = messages.slice(-5).map(msg => ({
-        type: msg.type === 'user' ? 'User' : 'Assistant',
-        content: msg.content
+        type: msg.sender === 'user' ? 'User' : 'Assistant',
+        content: msg.text
       }));
       
       // Show loading state
@@ -280,12 +280,15 @@ const Chatbot = () => {
   };
 
   const TypingIndicator = () => (
-    <div className="flex items-center space-x-2 p-3 bg-gray-100 rounded-2xl rounded-bl-none max-w-xs">
+    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-2xl rounded-bl-none max-w-xs border border-gray-200">
       <Bot className="w-5 h-5 text-sage" />
-      <div className="flex space-x-1">
-        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+      <div className="flex items-center space-x-1">
+        <span className="text-sm text-gray-500 mr-2">AI is thinking</span>
+        <div className="flex space-x-1">
+          <div className="w-2 h-2 bg-sage rounded-full animate-bounce"></div>
+          <div className="w-2 h-2 bg-sage rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+          <div className="w-2 h-2 bg-sage rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+        </div>
       </div>
     </div>
   );
@@ -296,7 +299,7 @@ const Chatbot = () => {
         <button
           key={index}
           onClick={() => handleQuickReply(reply)}
-          className="bg-sage/10 text-sage px-3 py-2 rounded-full text-sm hover:bg-sage/20 transition-colors"
+          className="bg-sage/10 text-sage px-3 py-2 rounded-xl text-sm hover:bg-sage/20 hover:scale-105 transition-all duration-200 border border-sage/20"
         >
           {reply.text}
         </button>
@@ -304,8 +307,58 @@ const Chatbot = () => {
     </div>
   );
 
+  // Enhanced markdown parser for chat messages
+  const parseMarkdown = (text) => {
+    if (!text) return text;
+    
+    // Split text into lines for processing
+    const lines = text.split('\n');
+    const parsedLines = lines.map((line, index) => {
+      let parsedLine = line;
+      
+      // Handle bold text **text** first
+      parsedLine = parsedLine.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>');
+      
+      // Handle bullet points with emojis or symbols
+      if (parsedLine.trim().startsWith('•')) {
+        const content = parsedLine.trim().substring(1).trim();
+        parsedLine = `<div class="flex items-start space-x-2 my-1 pl-2"><span class="text-sage font-bold text-lg leading-none">•</span><span class="flex-1">${content}</span></div>`;
+      }
+      // Handle dashes as bullet points
+      else if (parsedLine.trim().startsWith('- ')) {
+        const content = parsedLine.trim().substring(2).trim();
+        parsedLine = `<div class="flex items-start space-x-2 my-1 pl-2"><span class="text-sage font-bold text-lg leading-none">•</span><span class="flex-1">${content}</span></div>`;
+      }
+      // Handle emoji section headers (🌟 **Text:** or 🌟 Text:)
+      else if (/^[🌟🍽️📊⚠️💡🎯🔍✅❌🦋💪❤️🌸👨‍🍳🥗🍳🥤🔢💧🌅🌞🌤️🌙🔬📝✨🎯🌊🌿].+:/.test(parsedLine.trim())) {
+        parsedLine = `<div class="font-semibold text-sage mt-4 mb-2 text-base border-l-4 border-sage pl-3 bg-sage/5 py-2 rounded-r">${parsedLine.trim()}</div>`;
+      }
+      // Handle regular section headers (lines that end with : but no emoji)
+      else if (parsedLine.trim().endsWith(':') && parsedLine.trim().length > 1 && !parsedLine.includes('**') && !/^[🌟🍽️📊⚠️💡🎯🔍✅❌🦋💪❤️🌸👨‍🍳🥗🍳🥤🔢💧🌅🌞🌤️🌙🔬📝✨🎯🌊🌿]/.test(parsedLine.trim())) {
+        parsedLine = `<div class="font-semibold text-gray-700 mt-3 mb-1 text-sm uppercase tracking-wide">${parsedLine.trim()}</div>`;
+      }
+      // Handle standalone emojis or emoji with text (but not ending with :)
+      else if (/^[🌟🍽️📊⚠️💡🎯🔍✅❌🦋💪❤️🌸👨‍🍳🥗🍳🥤🔢💧🌅🌞🌤️🌙🔬📝✨🎯🌊🌿]/.test(parsedLine.trim()) && !parsedLine.trim().endsWith(':')) {
+        parsedLine = `<div class="my-2 font-medium">${parsedLine.trim()}</div>`;
+      }
+      // Regular text with content
+      else if (parsedLine.trim()) {
+        parsedLine = `<div class="my-1 leading-relaxed">${parsedLine.trim()}</div>`;
+      }
+      // Empty lines for spacing
+      else {
+        parsedLine = '<div class="my-2"></div>';
+      }
+      
+      return parsedLine;
+    });
+    
+    return parsedLines.join('');
+  };
+
   const MessageBubble = ({ message }) => {
     const isBot = message.sender === 'bot';
+    const formattedText = isBot ? parseMarkdown(message.text) : message.text;
     
     return (
       <motion.div
@@ -313,9 +366,9 @@ const Chatbot = () => {
         animate={{ opacity: 1, y: 0 }}
         className={`flex ${isBot ? 'justify-start' : 'justify-end'} mb-4`}
       >
-        <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+        <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
           isBot 
-            ? 'bg-gray-100 text-gray-800 rounded-bl-none' 
+            ? 'bg-gray-50 text-gray-800 rounded-bl-none border border-gray-200' 
             : 'bg-sage text-white rounded-br-none'
         }`}>
           {isBot && (
@@ -324,7 +377,17 @@ const Chatbot = () => {
               <span className="text-xs text-gray-500">AI Assistant</span>
             </div>
           )}
-          <p className="text-sm whitespace-pre-line">{message.text}</p>
+          {isBot ? (
+            <div 
+              className="text-sm formatted-message"
+              dangerouslySetInnerHTML={{ __html: formattedText }}
+              style={{
+                lineHeight: '1.5'
+              }}
+            />
+          ) : (
+            <p className="text-sm whitespace-pre-line">{message.text}</p>
+          )}
         </div>
       </motion.div>
     );
