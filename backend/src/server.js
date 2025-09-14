@@ -47,8 +47,8 @@ app.use("/api/", limiter);
 const corsOptions = {
   origin: [
     process.env.FRONTEND_URL || "http://localhost:3000",
+    "https://rainscareadmin.vercel.app",
     "http://localhost:3001",
-    "http://localhost:3002",
     "http://192.168.70.214:3000",
     "http://192.168.70.214:3001",
     "http://192.168.70.214:3002",
