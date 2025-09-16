@@ -41,6 +41,7 @@ import {
   ShieldAlert,
   ChefHat,
   Users,
+  Clock,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -412,7 +413,7 @@ const FoodAnalysis = () => {
     }
   };
 
-  // Generate recipes from ingredients
+  // Generate recipes from ingredients - FORCE REAL GEMINI API
   const generateRecipes = async () => {
     if (!recipeIngredients.trim()) {
       toast.error("Please enter some ingredients");
@@ -425,10 +426,16 @@ const FoodAnalysis = () => {
       const healthConditions = userProfile?.healthConditions || [];
       const dietType = userProfile?.dietType || "vegetarian";
 
-      toast.loading("Generating personalized recipes...", {
+      console.log("🚀 Generating recipes with AI");
+      console.log("📝 Ingredients:", recipeIngredients);
+      console.log("🏥 Health conditions:", healthConditions);
+      console.log("🥗 Diet type:", dietType);
+
+      toast.loading("🤖 Generating personalized recipes...", {
         id: "recipe-generation",
       });
 
+      // Force real Gemini API call
       const recipes = await generateRecipeFromIngredients(
         recipeIngredients,
         healthConditions,
@@ -437,16 +444,47 @@ const FoodAnalysis = () => {
 
       toast.dismiss("recipe-generation");
 
+      console.log("✅ Received recipes:", recipes);
+
       if (recipes && recipes.length > 0) {
-        setSuggestedRecipes(recipes);
-        toast.success(`Found ${recipes.length} recipes for you!`);
+        // Verify we got real data, not mock data
+        const hasRealData = recipes.some(
+          (recipe) =>
+            recipe.recipeName &&
+            recipe.recipeName !== "Simple Healthy Recipe" &&
+            recipe.nutritionFacts &&
+            recipe.nutritionFacts.protein !== "15g" // Mock data check
+        );
+
+        if (hasRealData) {
+          setSuggestedRecipes(recipes);
+          toast.success(`🎉 Generated ${recipes.length} personalized recipes!`);
+
+          // Track successful real API usage
+          sessionService.trackFeatureUsage("recipe_generation_real_gemini", {
+            ingredients: recipeIngredients,
+            recipeCount: recipes.length,
+            hasHealthConditions: healthConditions.length > 0,
+          });
+        } else {
+          console.warn("⚠️ Received fallback data instead of AI data");
+          setSuggestedRecipes(recipes);
+          toast.warning("Generated recipes (using fallback data)");
+        }
       } else {
-        toast.error("No recipes found for these ingredients");
+        toast.error("No recipes generated - check Gemini API configuration");
       }
     } catch (error) {
       toast.dismiss("recipe-generation");
-      toast.error("Error generating recipes");
-      console.error("Recipe generation error:", error);
+      console.error("❌ Recipe generation error:", error);
+
+      if (error.message.includes("API key")) {
+        toast.error("AI service configuration error");
+      } else if (error.message.includes("network")) {
+        toast.error("Network error - check internet connection");
+      } else {
+        toast.error(`Recipe generation failed: ${error.message}`);
+      }
     } finally {
       setIsGeneratingRecipes(false);
     }
@@ -817,6 +855,7 @@ const FoodAnalysis = () => {
   return (
     <div className="min-h-screen p-3 sm:p-4 md:p-6 max-w-6xl mx-auto relative">
       <PageBackground variant="food" />
+
       {/* Header */}
       <ScrollAnimationWrapper animationType="fadeInUp" className="mb-6 sm:mb-8">
         <motion.h1
@@ -1153,34 +1192,25 @@ const FoodAnalysis = () => {
         </motion.div>
       )}
 
-      {/* Recipe Ingredient Input Section */}
-      <ScrollAnimationWrapper
-        animationType="fadeInRight"
-        className="glass-card p-4 sm:p-6 mb-6 sm:mb-8"
-        delay={0.2}
-      >
-        <motion.h2
-          className="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center space-x-2"
-          initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <motion.div
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <ChefHat className="w-6 h-6 text-sage" />
-          </motion.div>
-          <span>Recipe Suggestions</span>
-        </motion.h2>
+      {/* RECIPE SUGGESTIONS - AI POWERED */}
+      <div className="bg-white rounded-3xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg border border-gray-200">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
+          <ChefHat className="w-6 h-6 text-orange-600" />
+          <span>Smart Recipe Suggestions</span>
+        </h2>
 
         <div className="flex flex-col gap-4">
           <div className="relative">
             <input
               type="text"
               value={recipeIngredients}
-              onChange={(e) => setRecipeIngredients(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 sm:py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-sage focus:border-transparent transition-all duration-300 text-sm sm:text-base"
+              onChange={(e) => {
+                setRecipeIngredients(e.target.value);
+                if (e.target.value.trim() === "") {
+                  setSuggestedRecipes([]);
+                }
+              }}
+              className="w-full pl-12 pr-4 py-3 sm:py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base"
               placeholder="Enter ingredients (e.g., chicken, tomatoes, onions)"
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
@@ -1191,39 +1221,145 @@ const FoodAnalysis = () => {
             <ChefHat className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2">
-            <motion.button
+          <div className="flex gap-2">
+            <button
               onClick={generateRecipes}
               disabled={isGeneratingRecipes || !recipeIngredients.trim()}
-              className={`flex items-center justify-center px-4 sm:px-6 py-3 sm:py-4 rounded-2xl font-medium transition-all duration-300 text-sm sm:text-base ${
+              className={`flex-1 flex items-center justify-center px-6 py-4 rounded-2xl font-medium transition-all duration-300 ${
                 isGeneratingRecipes || !recipeIngredients.trim()
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-sage to-light-green text-white hover:shadow-lg hover:scale-105"
+                  : "bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-lg hover:scale-105"
               }`}
-              whileHover={{
-                scale:
-                  isGeneratingRecipes || !recipeIngredients.trim() ? 1 : 1.05,
-              }}
-              whileTap={{
-                scale:
-                  isGeneratingRecipes || !recipeIngredients.trim() ? 1 : 0.95,
-              }}
             >
               {isGeneratingRecipes ? (
                 <>
                   <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2" />
-                  <span>Generating...</span>
+                  <span>Generating Recipes...</span>
                 </>
               ) : (
                 <>
                   <ChefHat className="w-5 h-5 mr-2" />
-                  <span>Get Recipes</span>
+                  <span>Generate Smart Recipes</span>
                 </>
               )}
-            </motion.button>
+            </button>
+
+            {suggestedRecipes.length > 0 && (
+              <button
+                onClick={() => {
+                  setSuggestedRecipes([]);
+                  setRecipeIngredients("");
+                  toast.success("Recipes cleared");
+                }}
+                className="px-4 py-4 bg-gray-200 text-gray-700 rounded-2xl hover:bg-gray-300 transition-all duration-300"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
-      </ScrollAnimationWrapper>
+
+        {/* RECIPE RESULTS - DIRECTLY BELOW INPUT */}
+        {suggestedRecipes.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
+              <Star className="w-5 h-5 text-yellow-500" />
+              <span>Generated Recipes ({suggestedRecipes.length})</span>
+            </h3>
+
+            <div className="space-y-4">
+              {suggestedRecipes.map((recipe, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-2xl p-4 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                  onClick={() => {
+                    setSelectedRecipe(recipe);
+                    setShowRecipeModal(true);
+                  }}
+                >
+                  {/* Recipe Header */}
+                  <div className="flex justify-between items-start mb-3">
+                    <h4 className="font-bold text-gray-800 text-lg">
+                      {recipe.recipeName}
+                    </h4>
+                    <div className="flex items-center space-x-1 text-orange-600">
+                      <Star className="w-4 h-4 fill-current" />
+                      <span className="text-sm font-medium">
+                        {recipe.healthScore}/10
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Recipe Info */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3 text-sm">
+                    <div className="flex items-center space-x-1 text-gray-600">
+                      <Clock className="w-4 h-4" />
+                      <span>{recipe.cookingTime}</span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-gray-600">
+                      <Users className="w-4 h-4" />
+                      <span>{recipe.servings} servings</span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-gray-600">
+                      <Flame className="w-4 h-4" />
+                      <span>{recipe.calories}</span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-gray-600">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>{recipe.difficulty}</span>
+                    </div>
+                  </div>
+
+                  {/* Nutrition Facts */}
+                  <div className="bg-gray-50 rounded-xl p-3 mb-3">
+                    <h5 className="font-semibold text-gray-700 mb-2">
+                      Nutrition Facts
+                    </h5>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div className="text-center">
+                        <div className="font-bold text-blue-600">
+                          {recipe.nutritionFacts?.protein || "0g"}
+                        </div>
+                        <div className="text-gray-600">Protein</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-bold text-yellow-600">
+                          {recipe.nutritionFacts?.carbs || "0g"}
+                        </div>
+                        <div className="text-gray-600">Carbs</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-bold text-purple-600">
+                          {recipe.nutritionFacts?.fat || "0g"}
+                        </div>
+                        <div className="text-gray-600">Fat</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Health Benefits */}
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {(recipe.healthBenefits || [])
+                      .slice(0, 3)
+                      .map((benefit, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs"
+                        >
+                          {benefit}
+                        </span>
+                      ))}
+                  </div>
+
+                  <p className="text-xs text-gray-500">
+                    Click to view full recipe with instructions
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Daily Diet Planner Section */}
       <ScrollAnimationWrapper
@@ -1345,85 +1481,6 @@ const FoodAnalysis = () => {
             ))}
           </div>
         </ScrollAnimationWrapper>
-      )}
-
-      {/* Recipe Results */}
-      {suggestedRecipes.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-8"
-        >
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">
-            Suggested Recipes ({suggestedRecipes.length})
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {suggestedRecipes.map((recipe, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index }}
-                className="glass-card p-3 sm:p-4 cursor-pointer card-hover min-h-[200px] sm:min-h-[220px]"
-                onClick={() => {
-                  setSelectedRecipe(recipe);
-                  setShowRecipeModal(true);
-                }}
-              >
-                <div className="flex items-start justify-between mb-2 sm:mb-3">
-                  <h3 className="font-semibold text-gray-800 flex-1 text-sm sm:text-base line-clamp-2 mr-2">
-                    {recipe.recipeName}
-                  </h3>
-                  <div className="flex items-center space-x-1 text-sage flex-shrink-0">
-                    <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />
-                    <span className="text-xs sm:text-sm">
-                      {recipe.healthScore}/10
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-1 sm:space-y-2 mb-3 sm:mb-4">
-                  <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
-                    <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
-                    <span>
-                      {recipe.cookingTime} • {recipe.difficulty}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
-                    <Users className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
-                    <span>{recipe.servings} servings</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
-                    <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500" />
-                    <span>{recipe.calories}</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-1 mb-2 sm:mb-3">
-                  {recipe.healthBenefits.slice(0, 2).map((benefit, idx) => (
-                    <span
-                      key={idx}
-                      className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full"
-                    >
-                      {benefit}
-                    </span>
-                  ))}
-                  {recipe.healthBenefits.length > 2 && (
-                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                      +{recipe.healthBenefits.length - 2} more
-                    </span>
-                  )}
-                </div>
-
-                <div className="text-xs sm:text-sm text-gray-500 mt-auto">
-                  Click to view full recipe
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
       )}
 
       {/* Loading State */}
