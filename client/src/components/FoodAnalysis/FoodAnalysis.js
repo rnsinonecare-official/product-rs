@@ -122,7 +122,7 @@ const FoodAnalysis = () => {
       const healthConditions = userProfile?.healthConditions || [];
       console.log("🏥 Health conditions:", healthConditions);
 
-      toast.loading("rainscare is analyzing food options...", {
+      toast.loading("Analyzing food options...", {
         id: "food-search",
       });
 
@@ -152,7 +152,7 @@ const FoodAnalysis = () => {
         };
 
         setSearchResults([transformedResult]);
-        toast.success(`rainscare analyzed: ${result.foodName}`);
+        toast.success(`Food analyzed: ${result.foodName}`);
 
         // Track feature usage
         sessionService.trackFeatureUsage("food_analysis", {
@@ -166,12 +166,10 @@ const FoodAnalysis = () => {
       }
     } catch (error) {
       toast.dismiss("food-search");
-      console.error("rainscare Food search error:", error);
+      console.error("Food search error:", error);
 
       if (error.message.includes("API key")) {
-        toast.error(
-          "rainscare service configuration error. Please check setup."
-        );
+        toast.error("Service configuration error. Please check setup.");
       } else if (error.message.includes("network")) {
         toast.error("Network error. Please check your connection.");
       } else {
@@ -207,7 +205,7 @@ const FoodAnalysis = () => {
           // Get user's health conditions for personalized analysis
           const healthConditions = userProfile?.healthConditions || [];
 
-          toast.loading("Analyzing food with rainscare...", {
+          toast.loading("Analyzing food with AI...", {
             id: "ai-analysis",
           });
 
@@ -225,7 +223,7 @@ const FoodAnalysis = () => {
           }
         } catch (error) {
           toast.dismiss("ai-analysis");
-          console.error("Rainscare Image analysis error:", error);
+          console.error("Image analysis error:", error);
 
           // Better error handling
           if (error.message.includes("API key")) {
@@ -266,17 +264,17 @@ const FoodAnalysis = () => {
       // Get user's health conditions for personalized analysis
       const healthConditions = userProfile?.healthConditions || [];
 
-      console.log("Starting Rainscare analysis for:", foodName);
+      console.log("Starting AI analysis for:", foodName);
       console.log("User health conditions:", healthConditions);
 
-      toast.loading("Analyzing food with Rainscare...", {
+      toast.loading("Analyzing food with AI...", {
         id: "ai-text-analysis",
       });
 
       // Use Gemini AI for food analysis
       const result = await analyzeFoodByName(foodName, healthConditions);
 
-      console.log("Rainscare analysis result:", result);
+      console.log("AI analysis result:", result);
 
       toast.dismiss("ai-text-analysis");
 
@@ -294,7 +292,7 @@ const FoodAnalysis = () => {
       }
     } catch (error) {
       toast.dismiss("ai-text-analysis");
-      console.error("Rainscare Text analysis error:", error);
+      console.error("Text analysis error:", error);
 
       // Better error handling
       if (error.message.includes("API key")) {
@@ -885,7 +883,7 @@ const FoodAnalysis = () => {
       >
         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center space-x-2">
           <Brain className="w-6 h-6 text-emerald-600" />
-          <span>Rainscare Food Analysis</span>
+          <span>AI Food Analysis</span>
         </h2>
 
         <div className="flex flex-col gap-4">
@@ -899,7 +897,7 @@ const FoodAnalysis = () => {
                   handleAiAnalysis(searchTerm);
                 }
               }}
-              placeholder="Enter food name for Rainscare analysis (e.g., banana, grilled chicken)..."
+              placeholder="Enter food name for AI analysis (e.g., banana, grilled chicken)..."
               className="w-full pl-12 pr-4 py-3 sm:py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base"
             />
             <Brain className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -927,31 +925,7 @@ const FoodAnalysis = () => {
               ) : (
                 <>
                   <Brain className="w-5 h-5 mr-2" />
-                  <span>Analyze with Rainscare</span>
-                </>
-              )}
-            </motion.button>
-
-            <motion.button
-              onClick={() => searchFoodApi(searchTerm)}
-              disabled={isLoading || !searchTerm.trim()}
-              className={`flex items-center justify-center px-4 sm:px-6 py-3 sm:py-4 rounded-2xl font-medium transition-all duration-300 text-sm sm:text-base ${
-                isLoading || !searchTerm.trim()
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:shadow-lg hover:scale-105"
-              }`}
-              whileHover={{ scale: isLoading || !searchTerm.trim() ? 1 : 1.05 }}
-              whileTap={{ scale: isLoading || !searchTerm.trim() ? 1 : 0.95 }}
-            >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2" />
-                  <span>Searching...</span>
-                </>
-              ) : (
-                <>
-                  <Search className="w-5 h-5 mr-2" />
-                  <span>Rainscare Search</span>
+                  <span>Analyze with AI</span>
                 </>
               )}
             </motion.button>
@@ -1072,7 +1046,7 @@ const FoodAnalysis = () => {
         >
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center space-x-2">
             <CheckCircle className="w-6 h-6 text-emerald-600" />
-            <span>Rainscare Analysis Results</span>
+            <span>AI Analysis Results</span>
           </h2>
 
           <div className="bg-emerald-50 rounded-2xl p-6 text-gray-800">
@@ -1681,7 +1655,7 @@ const FoodAnalysis = () => {
                 <div className="flex-1 min-w-0">
                   <h2 className="text-lg sm:text-2xl font-bold text-gray-800 flex items-center">
                     <Brain className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-emerald-500" />
-                    Rainscare Food Analysis
+                    AI Food Analysis
                   </h2>
                   <h3 className="text-base sm:text-xl font-semibold text-sage mt-1 line-clamp-2">
                     {aiAnalysisResult.foodName}
@@ -1763,7 +1737,7 @@ const FoodAnalysis = () => {
               {/* Recommendation */}
               <div className="bg-gray-50 rounded-2xl p-4 mb-4">
                 <h4 className="font-semibold text-gray-800 mb-2">
-                  Rainscare Recommendation
+                  AI Recommendation
                 </h4>
                 <p className="text-gray-700">
                   {aiAnalysisResult.recommendation}

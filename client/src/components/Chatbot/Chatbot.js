@@ -366,7 +366,7 @@ const Chatbot = () => {
         animate={{ opacity: 1, y: 0 }}
         className={`flex ${isBot ? 'justify-start' : 'justify-end'} mb-4`}
       >
-        <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
+        <div className={`max-w-[280px] sm:max-w-xs lg:max-w-md px-3 sm:px-4 py-2 sm:py-3 rounded-2xl ${
           isBot 
             ? 'bg-gray-50 text-gray-800 rounded-bl-none border border-gray-200' 
             : 'bg-sage text-white rounded-br-none'
@@ -480,7 +480,7 @@ const Chatbot = () => {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50"
+            className="fixed bottom-24 right-3 sm:right-6 w-[calc(100vw-24px)] sm:w-96 max-w-md h-[500px] sm:h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50"
           >
             {/* Header */}
             <div className="bg-sage text-white p-4 rounded-t-2xl">
@@ -504,7 +504,7 @@ const Chatbot = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
               {messages.map((message) => (
                 <MessageBubble key={message.id} message={message} />
               ))}
@@ -514,7 +514,7 @@ const Chatbot = () => {
             </div>
 
             {/* Input */}
-            <div className="border-t border-gray-200 p-4">
+            <div className="border-t border-gray-200 p-3 sm:p-4">
               {/* Character count and error display */}
               <div className="mb-2 flex justify-between items-center text-xs">
                 <span className={`${
@@ -537,10 +537,10 @@ const Chatbot = () => {
                     value={inputMessage}
                     onChange={handleInputChange}
                     onKeyPress={handleKeyPress}
-                    placeholder="Ask about your nutrition... (max 500 characters)"
+                    placeholder="Ask about your nutrition..."
                     rows={1}
                     maxLength={MAX_MESSAGE_LENGTH}
-                    className={`w-full px-4 py-2 border rounded-2xl resize-none focus:outline-none focus:ring-2 transition-colors ${
+                    className={`w-full px-3 sm:px-4 py-2 border rounded-2xl resize-none focus:outline-none focus:ring-2 transition-colors text-sm sm:text-base ${
                       inputError 
                         ? 'border-red-300 focus:ring-red-500' 
                         : 'border-gray-300 focus:ring-sage'
