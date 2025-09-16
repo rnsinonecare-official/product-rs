@@ -337,20 +337,51 @@ router.post('/generate-multiple-recipes',
     const { ingredients, healthConditions = [], dietType = 'vegetarian' } = req.body;
 
     try {
-      // Use mock service temporarily (switch to geminiService when API key is configured)
-      const recipes = process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your-gemini-api-key-from-ai-studio' 
-        ? await geminiService.generateRecipeFromIngredients(ingredients, healthConditions, dietType)
-        : await mockFoodService.generateRecipeFromIngredients(ingredients, healthConditions, dietType);
+      console.log('🚀 FORCING REAL GEMINI API FOR RECIPE GENERATION');
+      console.log('🔑 API Key exists:', !!process.env.GEMINI_API_KEY);
+      console.log('📝 Ingredients:', ingredients);
+      console.log('🏥 Health conditions:', healthConditions);
+      console.log('🥗 Diet type:', dietType);
 
+      // FORCE REAL GEMINI API - NO MOCK DATA
+      const recipes = await geminiService.generateRecipeFromIngredients(ingredients, healthConditions, dietType);
+      
+      console.log('✅ Generated recipes with real Gemini API:', recipes.length, 'recipes');
+      
+      // Verify we got real data
+      const hasRealData = recipes && recipes.length > 0 && recipes[0].recipeName !== "Simple Healthy Recipe";
+      
       res.json({
         success: true,
         data: recipes,
         count: recipes.length,
-        message: 'Multiple recipes generated successfully'
+        message: hasRealData 
+          ? 'Multiple recipes generated successfully with Gemini AI' 
+          : 'Recipes generated with fallback data (check Gemini API)',
+        source: hasRealData ? 'gemini_ai' : 'fallback',
+        apiKeyConfigured: !!process.env.GEMINI_API_KEY
       });
     } catch (error) {
-      console.error('Multiple recipes generation error:', error);
-      throw new AppError('Failed to generate recipes', 500);
+      console.error('❌ Multiple recipes generation error:', error);
+      
+      // If Gemini fails, try one more time with detailed error logging
+      try {
+        console.log('🔄 Gemini failed, trying again with detailed logging...');
+        const fallbackRecipes = await mockFoodService.generateRecipeFromIngredients(ingredients, healthConditions, dietType);
+        
+        res.json({
+          success: true,
+          data: fallbackRecipes,
+          count: fallbackRecipes.length,
+          message: 'Recipes generated with fallback service (Gemini API failed)',
+          source: 'fallback',
+          error: error.message,
+          apiKeyConfigured: !!process.env.GEMINI_API_KEY
+        });
+      } catch (fallbackError) {
+        console.error('❌ Even fallback failed:', fallbackError);
+        throw new AppError('Failed to generate recipes with both Gemini and fallback services', 500);
+      }
     }
   })
 );

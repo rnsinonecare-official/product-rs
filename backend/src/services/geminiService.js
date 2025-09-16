@@ -1,5 +1,8 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+// Load environment variables
+require('dotenv').config();
+
 const API_KEY = process.env.GEMINI_API_KEY;
 
 // Initialize Gemini AI with different model configurations
@@ -7,7 +10,7 @@ let genAI;
 let models = {};
 
 try {
-  if (API_KEY) {
+  if (API_KEY && API_KEY !== 'your-gemini-api-key-from-ai-studio') {
     genAI = new GoogleGenerativeAI(API_KEY);
     
     // Default model for general use (food analysis, nutrition advice)
@@ -38,8 +41,8 @@ try {
     models.recipe = genAI.getGenerativeModel({ 
       model: 'gemini-1.5-flash',
       generationConfig: {
-        maxOutputTokens: 1200,    // Longer output for detailed recipes
-        temperature: 0.6,         // More consistent for structured data
+        maxOutputTokens: 2000,    // Increased for complete recipes
+        temperature: 0.4,         // More consistent for structured data
         topP: 0.8,
         topK: 40,
         candidateCount: 1
@@ -306,78 +309,78 @@ const generateRecipeFromIngredients = async (ingredients, healthConditions = [],
       ? `User has these health conditions: ${healthConditions.join(', ')}. ` 
       : '';
 
-    const prompt = `
-      Generate 3 healthy recipes using these ingredients: ${ingredients}
-      
-      User preferences:
-      - Diet type: ${dietType}
-      - ${healthConditionsText}
-      
-      For each recipe, provide:
-      1. Recipe name
-      2. Cooking time
-      3. Difficulty level
-      4. Servings
-      5. Calories per serving
-      6. Health score (1-10)
-      7. Ingredients with amounts
-      8. Step-by-step instructions
-      9. Nutritional facts (protein, carbs, fat, fiber, sugar, sodium)
-      10. Health benefits
-      11. Suitable for (health conditions)
-      12. Modifications for specific conditions
-      13. Cooking tips
-      
-      Return as JSON array with this structure:
-      [
-        {
-          "recipeName": "Recipe Name",
-          "cookingTime": "30 minutes",
-          "difficulty": "Easy/Medium/Hard",
-          "servings": "2-3",
-          "calories": "200-300 per serving",
-          "healthScore": 8,
-          "ingredients": [
-            {
-              "item": "Ingredient name",
-              "amount": "1 cup",
-              "notes": "Optional prep notes"
-            }
-          ],
-          "instructions": [
-            "Step 1",
-            "Step 2"
-          ],
-          "nutritionFacts": {
-            "protein": "15g",
-            "carbs": "20g",
-            "fat": "8g",
-            "fiber": "5g",
-            "sugar": "3g",
-            "sodium": "200mg"
-          },
-          "healthBenefits": ["Benefit 1", "Benefit 2"],
-          "suitableFor": ["General health", "Weight loss"],
-          "modifications": {
-            "diabetes": "Reduce carbs, add more fiber",
-            "hypertension": "Reduce sodium, add potassium-rich foods",
-            "pcos": "Add anti-inflammatory spices"
-          },
-          "tips": ["Tip 1", "Tip 2"]
-        }
-      ]
-    `;
+    const prompt = `Generate 3 healthy recipes using these ingredients: ${ingredients}
+
+User preferences:
+- Diet type: ${dietType}
+- ${healthConditionsText}
+
+IMPORTANT: Return ONLY valid JSON array, no other text. Use this exact format:
+
+[
+  {
+    "recipeName": "Recipe Name Here",
+    "cookingTime": "30 minutes",
+    "difficulty": "Easy",
+    "servings": "2-3",
+    "calories": "300 per serving",
+    "healthScore": 8,
+    "ingredients": [
+      {
+        "item": "Ingredient name",
+        "amount": "1 cup",
+        "notes": "Fresh preferred"
+      }
+    ],
+    "instructions": [
+      "Step 1 description",
+      "Step 2 description"
+    ],
+    "nutritionFacts": {
+      "protein": "25g",
+      "carbs": "15g",
+      "fat": "12g",
+      "fiber": "6g",
+      "sugar": "4g",
+      "sodium": "180mg"
+    },
+    "healthBenefits": ["High protein", "Low carb"],
+    "suitableFor": ["Diabetes", "Weight loss"],
+    "modifications": {
+      "diabetes": "Reduce carbs further",
+      "hypertension": "Use less salt"
+    },
+    "tips": ["Cook on medium heat", "Serve immediately"]
+  }
+]
+
+Return ONLY the JSON array, no explanations or additional text.`;
 
     const result = await models.recipe.generateContent(prompt);
     const response = result.response;
     const text = response.text();
 
-    // Extract JSON from response
-    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    // Clean and extract JSON from response
+    let cleanText = text.trim();
+    
+    // Remove any markdown code blocks
+    cleanText = cleanText.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+    
+    // Find JSON array
+    const jsonMatch = cleanText.match(/\[[\s\S]*\]/);
     if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+      try {
+        const recipes = JSON.parse(jsonMatch[0]);
+        console.log('✅ Successfully parsed', recipes.length, 'recipes from Gemini');
+        return recipes;
+      } catch (parseError) {
+        console.error('❌ JSON parse error:', parseError.message);
+        console.error('Raw response:', text.substring(0, 500));
+        throw new Error('Invalid JSON format from Gemini AI');
+      }
     } else {
-      throw new Error('Invalid response format from Gemini AI');
+      console.error('❌ No JSON array found in response:', text.substring(0, 200));
+      throw new Error('No valid JSON array found in Gemini response');
     }
 
   } catch (error) {

@@ -563,7 +563,7 @@ const analyzeFoodByName = async (foodName, healthConditions = []) => {
   }
 };
 
-// Generate healthy recipe using Google GenAI with Vertex AI
+// Generate healthy recipe using Google GenAI with Vertex AI - IMPROVED WITH VARIETY
 const generateHealthyRecipe = async (
   ingredients,
   healthConditions = [],
@@ -575,11 +575,21 @@ const generateHealthyRecipe = async (
     }
 
     console.log(
-      "🔄 Generating healthy recipe with Google GenAI Vertex AI (Gemini 2.0 Flash)..."
+      "🔄 Generating VARIED healthy recipe with Google GenAI Vertex AI (Gemini 2.0 Flash)..."
     );
     console.log("🥕 Ingredients:", ingredients);
     console.log("🏥 Health conditions:", healthConditions);
     console.log("🍽️ Dietary preferences:", dietaryPreferences);
+
+    // ADD VARIETY ELEMENTS
+    const cuisineStyles = ['Mediterranean', 'Asian-inspired', 'Indian fusion', 'Mexican-style', 'Italian-inspired', 'Middle Eastern', 'Thai-style', 'Japanese-inspired'];
+    const cookingMethods = ['grilled', 'roasted', 'stir-fried', 'steamed', 'baked', 'sautéed', 'braised', 'air-fried'];
+    const mealVibes = ['comfort food', 'light and fresh', 'hearty', 'gourmet-style', 'rustic', 'family-friendly'];
+    
+    const randomStyle = cuisineStyles[Math.floor(Math.random() * cuisineStyles.length)];
+    const randomMethod = cookingMethods[Math.floor(Math.random() * cookingMethods.length)];
+    const randomVibe = mealVibes[Math.floor(Math.random() * mealVibes.length)];
+    const uniqueId = Date.now() % 1000;
 
     const healthConditionsText =
       healthConditions.length > 0
@@ -593,33 +603,51 @@ const generateHealthyRecipe = async (
         ? `Dietary preferences: ${JSON.stringify(dietaryPreferences)}. `
         : "";
 
+    // DYNAMIC VARIED PROMPT
     const prompt = `
-    You are a professional chef and nutritionist. Create a healthy recipe using these ingredients: ${ingredients.join(
-      ", "
-    )}.
+    You are a creative ${randomStyle} chef specializing in ${randomVibe} cuisine. Create a unique ${randomMethod} recipe using: ${ingredients.join(", ")}.
 
+    CREATIVE CONSTRAINTS:
+    - Cuisine influence: ${randomStyle}
+    - Primary cooking method: ${randomMethod}
+    - Style: ${randomVibe}
+    - Uniqueness factor: ${uniqueId}
+    
     ${healthConditionsText}
     ${dietaryText}
 
-    Please create a recipe and respond with ONLY a valid JSON object in this exact format:
+    INNOVATION REQUIREMENTS:
+    1. Make this recipe feel completely different from typical ${ingredients[0]} dishes
+    2. Add an unexpected ${randomStyle} twist
+    3. Use creative ${randomMethod} techniques
+    4. Include a signature flavor combination
+    5. Add cultural inspiration from ${randomStyle} cuisine
+
+    Respond with ONLY a valid JSON object in this exact format:
 
     {
-      "recipeName": "creative and appetizing recipe name",
-      "description": "brief description of the dish",
+      "recipeName": "Creative name reflecting ${randomStyle} influence",
+      "cuisineStyle": "${randomStyle}",
+      "cookingMethod": "${randomMethod}",
+      "vibe": "${randomVibe}",
+      "description": "Enticing description highlighting unique ${randomStyle} elements",
+      "culturalInspiration": "Brief note about ${randomStyle} influence",
       "ingredients": [
         {
           "name": "ingredient name",
           "amount": "quantity with unit",
-          "notes": "any special notes or substitutions"
+          "preparation": "how to prep with ${randomMethod} technique",
+          "notes": "special notes or ${randomStyle} substitutions"
         }
       ],
       "instructions": [
-        "step 1 instruction",
-        "step 2 instruction"
+        "Step-by-step with ${randomMethod} techniques and ${randomStyle} methods"
       ],
+      "uniqueTwist": "What makes this ${randomStyle} recipe special",
+      "flavorProfile": "Dominant ${randomStyle} flavors and taste experience",
       "cookingTime": "total cooking time",
-      "prepTime": "preparation time",
-      "servings": 4,
+      "prepTime": "preparation time", 
+      "servings": 2-4,
       "difficulty": "Easy/Medium/Hard",
       "nutritionInfo": {
         "calories": "estimated calories per serving",
@@ -628,14 +656,16 @@ const generateHealthyRecipe = async (
         "fat": "fat content",
         "fiber": "fiber content"
       },
-      "healthBenefits": ["list of health benefits"],
-      "suitableFor": ["health conditions this recipe is good for"],
-      "tags": ["recipe tags like 'low-sodium', 'high-protein'"],
-      "tips": ["cooking tips and variations"]
+      "healthBenefits": ["Specific benefits for health conditions"],
+      "suitableFor": ["Health conditions this recipe supports"],
+      "tags": ["${randomStyle}", "${randomMethod}", "${randomVibe}", "other relevant tags"],
+      "tips": ["Professional ${randomStyle} cooking tips"],
+      "variations": ["Ways to modify with different ${randomStyle} ingredients"],
+      "servingSuggestion": "How to serve ${randomStyle} style",
+      "variationId": "${randomStyle}-${randomMethod}-${uniqueId}"
     }
 
-    Make sure the recipe is healthy and suitable for the user's health conditions.
-    Be creative but practical with the ingredients provided.
+    Make this recipe feel completely fresh and different with strong ${randomStyle} character!
     `;
 
     console.log(
