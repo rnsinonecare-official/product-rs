@@ -31,6 +31,8 @@ import NetworkStatus from './components/shared/NetworkStatus';
 
 import WelcomeBack from './components/shared/WelcomeBack';
 import Footer from './components/shared/Footer';
+import ScrollToTop from './components/shared/ScrollToTop';
+import ScrollToTopOnRouteChange from './components/shared/ScrollToTopOnRouteChange';
 
 // Context
 import { UserProvider, useUser } from './context/UserContext';
@@ -122,6 +124,7 @@ function AppContent() {
 
   return (
     <Router>
+      <ScrollToTopOnRouteChange />
       <div className="min-h-screen bg-gradient-to-br from-pastel-green via-cream to-powder-blue relative">
         <FloatingBackground />
         
@@ -173,6 +176,7 @@ function AppContent() {
                   </main>
                   <Footer />
                   <Chatbot />
+                  <ScrollToTop />
                 </>
               )}
             </>

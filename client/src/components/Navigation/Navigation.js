@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../../context/UserContext';
 import { logoutUser } from '../../services/authService';
@@ -75,6 +75,7 @@ const scrollDirection = 'up'; // This would normally be calculated based on scro
 
 const Navigation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { userProfile, clearUserData } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -265,7 +266,7 @@ const Navigation = () => {
                       bounce: 0.3, 
                       duration: 0.4 
                     }}
-                    className="absolute right-0 mt-2 w-64 bg-white/95 rounded-2xl shadow-xl border border-white/20 overflow-hidden"
+                    className="absolute right-0 mt-2 w-64 bg-white/95 rounded-2xl shadow-xl border border-white/20 overflow-hidden z-50"
                     style={{ transformOrigin: "top right" }}
                   >
                     {/* Profile Info */}
@@ -299,26 +300,32 @@ const Navigation = () => {
                     >
                       {/* Profile Menu Navigation Items */}
                       {profileMenuItems.map((item, index) => (
-                        <Link key={item.path} to={item.path} onClick={() => setShowProfileMenu(false)}>
-                          <motion.button 
-                            className="w-full flex items-center px-3 py-2 text-left text-gray-700 hover:bg-sage/10 rounded-xl transition-all duration-300"
-                            variants={slideInUp}
-                            whileHover={{ 
-                              x: 5, 
-                              backgroundColor: "rgba(144, 238, 144, 0.1)",
-                            }}
-                            whileTap={tapScale}
-                            transition={{ delay: index * 0.05 }}
+                        <motion.div
+                          key={item.path}
+                          variants={slideInUp}
+                          whileHover={{ 
+                            x: 5, 
+                            backgroundColor: "rgba(144, 238, 144, 0.1)",
+                          }}
+                          whileTap={tapScale}
+                          transition={{ delay: index * 0.05 }}
+                          className="w-full flex items-center px-3 py-2 text-left text-gray-700 hover:bg-sage/10 rounded-xl transition-all duration-300 cursor-pointer select-none"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowProfileMenu(false);
+                            // Small delay to ensure menu closes before navigation
+                            setTimeout(() => navigate(item.path), 100);
+                          }}
+                        >
+                          <motion.div
+                            animate={{ rotate: [0, 10, 0] }}
+                            transition={{ delay: 0.5 + index * 0.1 }}
                           >
-                            <motion.div
-                              animate={{ rotate: [0, 10, 0] }}
-                              transition={{ delay: 0.5 + index * 0.1 }}
-                            >
-                              <item.icon className="w-5 h-5 mr-3" />
-                            </motion.div>
-                            {item.label}
-                          </motion.button>
-                        </Link>
+                            <item.icon className="w-5 h-5 mr-3" />
+                          </motion.div>
+                          {item.label}
+                        </motion.div>
                       ))}
                       
                       {/* Divider */}
@@ -329,29 +336,35 @@ const Navigation = () => {
                         transition={{ delay: 0.8 }}
                       />
                       
-                      <motion.button 
-                        className="w-full flex items-center px-3 py-2 text-left text-gray-700 hover:bg-sage/10 rounded-xl transition-all duration-300"
+                      <motion.div 
+                        className="w-full flex items-center px-3 py-2 text-left text-gray-700 hover:bg-sage/10 rounded-xl transition-all duration-300 cursor-pointer select-none"
                         variants={slideInUp}
                         whileHover={{ x: 5 }}
                         whileTap={tapScale}
-                        onClick={() => {
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           toast.info('Download app feature coming soon!');
                           setShowProfileMenu(false);
                         }}
                       >
                         <Settings className="w-5 h-5 mr-3" />
                         Download App
-                      </motion.button>
-                      <motion.button 
-                        onClick={handleLogout}
-                        className="w-full flex items-center px-3 py-2 text-left text-red-600 hover:bg-red/10 rounded-xl transition-all duration-300"
+                      </motion.div>
+                      <motion.div 
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleLogout();
+                        }}
+                        className="w-full flex items-center px-3 py-2 text-left text-red-600 hover:bg-red/10 rounded-xl transition-all duration-300 cursor-pointer select-none"
                         variants={slideInUp}
                         whileHover={{ x: 5, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
                         whileTap={tapScale}
                       >
                         <LogOut className="w-5 h-5 mr-3" />
                         Logout
-                      </motion.button>
+                      </motion.div>
                     </motion.div>
                   </motion.div>
                 )}
@@ -361,7 +374,7 @@ const Navigation = () => {
               {/* Mobile Menu Button */}
               <motion.button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl hover:bg-sage/10 transition-all duration-300"
+              className="md:hidden p-2 rounded-xl bg-white/80 border border-sage/20 shadow-md hover:bg-sage/10 transition-all duration-300"
               whileHover={{ 
                 scale: 1.05,
                 rotate: 5,
@@ -381,7 +394,7 @@ const Navigation = () => {
                     exit={{ rotate: 90, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <X className="w-6 h-6 text-gray-600" />
+                    <X className="w-6 h-6 text-sage" />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -391,7 +404,7 @@ const Navigation = () => {
                     exit={{ rotate: -90, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <Menu className="w-6 h-6 text-gray-600" />
+                    <Menu className="w-6 h-6 text-sage" />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -415,7 +428,7 @@ const Navigation = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/30"
+              className="absolute inset-0 bg-black/50"
               onClick={() => setIsMobileMenuOpen(false)}
             />
 
@@ -430,7 +443,7 @@ const Navigation = () => {
                 duration: 0.5,
                 opacity: { duration: 0.3 }
               }}
-              className="absolute top-14 sm:top-16 right-0 w-72 sm:w-80 h-full bg-white/98 border-l border-white/20"
+              className="absolute top-14 sm:top-16 right-0 w-72 sm:w-80 h-full bg-white border-l border-gray-200 shadow-2xl"
             >
               <div className="p-4 sm:p-6">
                 {/* Profile Section */}
@@ -524,17 +537,30 @@ const Navigation = () => {
 
                 {/* Bottom Actions */}
                 <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 space-y-2">
-                  <button className="w-full flex items-center px-4 py-3 text-left text-gray-700 hover:bg-sage/10 rounded-xl transition-all duration-300">
+                  <div 
+                    className="w-full flex items-center px-4 py-3 text-left text-gray-700 hover:bg-sage/10 rounded-xl transition-all duration-300 cursor-pointer select-none"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsMobileMenuOpen(false);
+                      setTimeout(() => navigate('/settings'), 100);
+                    }}
+                  >
                     <Settings className="w-5 h-5 mr-3" />
                     Settings
-                  </button>
-                  <button 
-                    onClick={handleLogout}
-                    className="w-full flex items-center px-4 py-3 text-left text-red-600 hover:bg-red/10 rounded-xl transition-all duration-300"
+                  </div>
+                  <div 
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full flex items-center px-4 py-3 text-left text-red-600 hover:bg-red/10 rounded-xl transition-all duration-300 cursor-pointer select-none"
                   >
                     <LogOut className="w-5 h-5 mr-3" />
                     Logout
-                  </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -545,8 +571,11 @@ const Navigation = () => {
       {/* Click outside to close profile menu */}
       {showProfileMenu && (
         <div 
-          className="fixed inset-0 z-30"
-          onClick={() => setShowProfileMenu(false)}
+          className="fixed inset-0 z-20"
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            setShowProfileMenu(false);
+          }}
         />
       )}
     </>

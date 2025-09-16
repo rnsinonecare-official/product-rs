@@ -807,8 +807,16 @@ const generateDailyDietPlan = async (
 
     const { cuisineType = [], allergies = [], dislikes = [] } = preferences;
 
+    // Add randomization elements for variety
+    const currentDate = new Date().toISOString().split('T')[0];
+    const randomSeed = Math.floor(Math.random() * 1000);
+    const seasonalFoods = getSeasonalFoods();
+    const varietyPrompt = getVarietyPrompt();
+
     // Create comprehensive prompt for diet plan generation
-    const prompt = `You are a professional nutritionist and dietitian. Create a comprehensive daily diet plan based on the user's profile and meal history.
+    const prompt = `You are a professional nutritionist and dietitian. Create a comprehensive daily diet plan based on the user's profile and meal history. 
+
+IMPORTANT: Generate a UNIQUE and VARIED plan each time. Use different foods, cooking methods, and meal combinations to ensure variety.
 
 USER PROFILE:
 - Health Conditions: ${healthConditions.join(", ") || "None"}
@@ -829,6 +837,12 @@ ${
     ? mealHistory.slice(0, 15).join(", ")
     : "No recent meals recorded"
 }
+
+VARIETY REQUIREMENTS:
+- Date: ${currentDate} (use this for seasonal variety)
+- Random seed: ${randomSeed} (use this to ensure different combinations)
+- Seasonal focus: ${seasonalFoods}
+- Variety instruction: ${varietyPrompt}
 
 Please create a detailed daily diet plan with the following structure:
 
@@ -925,6 +939,7 @@ IMPORTANT GUIDELINES:
 6. Consider cultural and regional food preferences
 7. Ensure nutritional balance across all meals
 8. Provide alternatives for dietary flexibility
+9. ALL NUMBERS MUST BE WHOLE NUMBERS (no decimals) - round all calorie and nutrient values
 
 Return ONLY the JSON object, no additional text or explanations.`;
 
@@ -936,8 +951,8 @@ Return ONLY the JSON object, no additional text or explanations.`;
       model: "gemini-2.0-flash-exp",
       contents: prompt,
       generationConfig: {
-        temperature: 0.7,
-        topK: 40,
+        temperature: 0.9, // Increased for more variety
+        topK: 50,
         topP: 0.95,
         maxOutputTokens: 2048,
       },
@@ -959,7 +974,9 @@ Return ONLY the JSON object, no additional text or explanations.`;
           console.log("🎯 Daily Calorie Target:", dietPlan.dailyCalorieTarget);
           console.log("🍽️ Meals included:", Object.keys(dietPlan.meals).length);
 
-          return dietPlan;
+          // Clean up numbers to remove excessive decimals
+          const cleanedDietPlan = cleanDietPlanNumbers(dietPlan);
+          return cleanedDietPlan;
         } else {
           throw new Error("Invalid diet plan structure");
         }
@@ -980,22 +997,84 @@ Return ONLY the JSON object, no additional text or explanations.`;
   }
 };
 
+// Helper function to get seasonal foods
+const getSeasonalFoods = () => {
+  const month = new Date().getMonth();
+  const seasons = {
+    winter: ["citrus fruits", "root vegetables", "warming spices", "hearty grains"],
+    spring: ["leafy greens", "asparagus", "fresh herbs", "light proteins"],
+    summer: ["berries", "tomatoes", "cucumbers", "grilled foods"],
+    fall: ["squash", "apples", "nuts", "warming soups"]
+  };
+  
+  if (month >= 11 || month <= 1) return seasons.winter.join(", ");
+  if (month >= 2 && month <= 4) return seasons.spring.join(", ");
+  if (month >= 5 && month <= 7) return seasons.summer.join(", ");
+  return seasons.fall.join(", ");
+};
+
+// Helper function to get variety prompts
+const getVarietyPrompt = () => {
+  const prompts = [
+    "Focus on international cuisines and fusion dishes",
+    "Emphasize different cooking methods: grilled, steamed, roasted, raw",
+    "Include a mix of hot and cold dishes throughout the day",
+    "Vary protein sources and include plant-based options",
+    "Use different spice profiles and flavor combinations",
+    "Include both familiar and adventurous food choices"
+  ];
+  return prompts[Math.floor(Math.random() * prompts.length)];
+};
+
+// Helper function to clean up numbers in diet plan
+const cleanDietPlanNumbers = (dietPlan) => {
+  const cleaned = { ...dietPlan };
+  
+  // Round daily calorie target
+  if (cleaned.dailyCalorieTarget) {
+    cleaned.dailyCalorieTarget = Math.round(parseFloat(cleaned.dailyCalorieTarget));
+  }
+  
+  // Clean up meal calories
+  if (cleaned.meals) {
+    Object.keys(cleaned.meals).forEach(mealKey => {
+      const meal = cleaned.meals[mealKey];
+      if (meal.calories) {
+        meal.calories = Math.round(parseFloat(meal.calories));
+      }
+    });
+  }
+  
+  return cleaned;
+};
+
 // Helper function to create fallback diet plan
 const createFallbackDietPlan = (userProfile = {}, mealHistory = []) => {
   console.log("🔄 Creating fallback diet plan...");
 
   const { healthConditions = [], dietType = "vegetarian" } = userProfile;
   const isVegetarian = dietType === "vegetarian" || dietType === "vegan";
+  
+  // Add randomization to fallback plans
+  const randomIndex = Math.floor(Math.random() * 3);
+  
+  const breakfastOptions = isVegetarian ? [
+    ["Oatmeal with fruits and nuts", "Green tea", "Banana"],
+    ["Smoothie bowl with berries", "Herbal tea", "Whole grain toast"],
+    ["Chia pudding with mango", "Matcha latte", "Mixed nuts"]
+  ] : [
+    ["Scrambled eggs with toast", "Orange juice", "Greek yogurt"],
+    ["Protein pancakes with berries", "Coffee", "Cottage cheese"],
+    ["Avocado toast with egg", "Green smoothie", "Turkey sausage"]
+  ];
 
   return {
-    dailyCalorieTarget: 2000,
+    dailyCalorieTarget: Math.round(2000 + (Math.random() * 400 - 200)), // Vary between 1800-2200, rounded
     meals: {
       breakfast: {
         time: "7:00 AM - 8:00 AM",
-        foods: isVegetarian
-          ? ["Oatmeal with fruits and nuts", "Green tea", "Banana"]
-          : ["Scrambled eggs with toast", "Orange juice", "Greek yogurt"],
-        calories: 350,
+        foods: breakfastOptions[randomIndex],
+        calories: Math.round(350 + (Math.random() * 100 - 50)), // Vary calories, rounded
         nutrients: { protein: "12g", carbs: "45g", fat: "8g" },
         preparationTips: [
           "Prepare oats the night before",
