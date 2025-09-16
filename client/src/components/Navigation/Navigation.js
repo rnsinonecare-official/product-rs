@@ -147,9 +147,10 @@ const Navigation = () => {
           <div className="flex justify-between items-center h-14 sm:h-16 min-h-[56px] sm:min-h-[64px]">
             {/* Logo */}
             <motion.div
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 cursor-pointer"
               whileHover={hoverScale}
               whileTap={tapScale}
+              onClick={() => navigate('/')}
             >
               <motion.div 
                 className="w-14 h-14 sm:w-16 sm:h-16 lg:w-18 lg:h-18 bg-white rounded-full flex items-center justify-center p-2"
@@ -394,7 +395,7 @@ const Navigation = () => {
                     exit={{ rotate: 90, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <X className="w-6 h-6 text-sage" />
+                    <X className="w-6 h-6 text-gray-800" />
                   </motion.div>
                 ) : (
                   <motion.div
