@@ -54,7 +54,7 @@ import {
 
 const Dashboard = () => {
   const { userProfile } = useUser();
-  const { dailyData, getWeeklyData, updateDailyMetric } = useHealthData();
+  const { dailyData, userGoals, getWeeklyData, updateDailyMetric } = useHealthData();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [weeklyData, setWeeklyData] = useState([]);
   const [showMetabolicAgeTips, setShowMetabolicAgeTips] = useState(false);
@@ -322,7 +322,7 @@ const Dashboard = () => {
       key: 'calories',
       label: 'Calories',
       current: dailyData.totalCalories || 0,
-      target: 2000,
+      target: userGoals.calorieGoal || 2000,
       unit: 'kcal',
       icon: Flame,
       color: '#ef4444',
@@ -332,8 +332,8 @@ const Dashboard = () => {
       key: 'water',
       label: 'Water',
       current: dailyData.water || 0,
-      target: 2.5,
-      unit: 'liters',
+      target: userGoals.waterGoal || 8,
+      unit: 'glasses',
       icon: Droplets,
       color: '#3b82f6',
       bgColor: 'bg-blue-100',
@@ -342,7 +342,7 @@ const Dashboard = () => {
       key: 'steps',
       label: 'Steps',
       current: dailyData.steps || 0,
-      target: 10000,
+      target: userGoals.stepsGoal || 10000,
       unit: 'steps',
       icon: Activity,
       color: '#10b981',
@@ -352,7 +352,7 @@ const Dashboard = () => {
       key: 'sleep',
       label: 'Sleep',
       current: dailyData.sleep || 0,
-      target: 8,
+      target: userGoals.sleepGoal || 8,
       unit: 'hours',
       icon: Moon,
       color: '#8b5cf6',

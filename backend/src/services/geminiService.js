@@ -642,6 +642,7 @@ const generateMealPlan = async (options) => {
     - Appropriate for health conditions
     - Practical and achievable
     - Varied and interesting
+    - Most importantly, the total calories should be less then 10 difference from the daily calorie target.
     `;
 
     const result = await models.recipe.generateContent(prompt);

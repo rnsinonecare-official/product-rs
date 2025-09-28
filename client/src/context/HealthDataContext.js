@@ -307,6 +307,8 @@ export const HealthDataProvider = ({ children }) => {
 
       console.log('Updating user goals:', goals);
       await dailyIntakeService.updateUserGoals(goals);
+      
+      // Update local state immediately for better UX
       setUserGoals(goals);
       console.log('User goals updated successfully');
       return true;

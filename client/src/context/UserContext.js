@@ -363,7 +363,10 @@ export const UserProvider = ({ children }) => {
       }
 
       // Create a copy of updates to avoid mutating the original
-      const updatedData = { ...updates };
+      const updatedData = { 
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
 
       // Recalculate BMI and metabolic age if relevant data changed
       if (updates.height || updates.weight || updates.age || updates.gender || updates.activityLevel) {

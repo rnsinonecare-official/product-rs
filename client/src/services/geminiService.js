@@ -360,7 +360,8 @@ export const getMealRecommendations = async (
 // Generate daily diet plan based on user preferences and meal history
 export const generateDailyDietPlan = async (
   userProfile = {},
-  mealHistory = []
+  mealHistory = [],
+  userGoals = {} // Add userGoals parameter
 ) => {
   try {
     console.log("🤖 Generating daily diet plan via backend API");
@@ -373,6 +374,9 @@ export const generateDailyDietPlan = async (
         gender: userProfile.gender,
         activityLevel: userProfile.activityLevel || "moderate",
         goals: userProfile.goals || [],
+        calorieGoal: userGoals.calorieGoal || 1500, // Add calorie goal
+        location: userProfile.location || "India", // Add location with default to India
+        cuisinePreferences: userProfile.cuisinePreferences || [], // Add cuisine preferences
       },
       mealHistory: mealHistory.slice(0, 20), // Last 20 meals
       preferences: {
@@ -388,7 +392,7 @@ export const generateDailyDietPlan = async (
 
     // Fallback response
     return {
-      dailyCalorieTarget: 2000,
+      dailyCalorieTarget: userGoals.calorieGoal || 2000, // Use user's calorie goal
       meals: {
         breakfast: {
           time: "7:00 AM - 8:00 AM",
