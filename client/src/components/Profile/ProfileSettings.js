@@ -92,7 +92,14 @@ const ProfileSettings = () => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await updateUserProfile(formData);
+      // Ensure we're sending the complete profile data
+      const profileData = {
+        ...userProfile,
+        ...formData,
+        updatedAt: new Date().toISOString()
+      };
+      
+      await updateUserProfile(profileData);
       toast.success('Profile updated successfully!');
       setIsEditing(false);
     } catch (error) {
@@ -517,7 +524,11 @@ const ProfileSettings = () => {
                       <Calendar className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                       <input
                         type="text"
-                        value={userProfile?.createdAt ? new Date(userProfile.createdAt.toDate()).toLocaleDateString() : 'N/A'}
+                        value={userProfile?.createdAt ? 
+                          (typeof userProfile.createdAt.toDate === 'function' 
+                            ? new Date(userProfile.createdAt.toDate()).toLocaleDateString() 
+                            : new Date(userProfile.createdAt).toLocaleDateString())
+                          : 'N/A'}
                         disabled={true}
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
                       />
@@ -533,7 +544,11 @@ const ProfileSettings = () => {
                       <RefreshCw className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                       <input
                         type="text"
-                        value={userProfile?.updatedAt ? new Date(userProfile.updatedAt.toDate()).toLocaleDateString() : 'N/A'}
+                        value={userProfile?.updatedAt ? 
+                          (typeof userProfile.updatedAt.toDate === 'function' 
+                            ? new Date(userProfile.updatedAt.toDate()).toLocaleDateString() 
+                            : new Date(userProfile.updatedAt).toLocaleDateString())
+                          : 'N/A'}
                         disabled={true}
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
                       />

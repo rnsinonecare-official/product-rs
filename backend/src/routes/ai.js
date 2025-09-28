@@ -889,6 +889,7 @@ router.post('/generate-diet-plan',
     try {
       // Use Google GenAI with Vertex AI for diet plan generation
       console.log('🔄 Using Google GenAI with Vertex AI for diet plan generation...');
+      // Pass the calorie goal from userProfile to the Vertex AI service
       const dietPlan = await vertexAIService.generateDailyDietPlan(userProfile, mealHistory, preferences);
       console.log('✅ Google GenAI Vertex AI diet plan generation successful');
 

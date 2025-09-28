@@ -47,7 +47,7 @@ import toast from "react-hot-toast";
 
 const FoodAnalysis = () => {
   const { userProfile, isAuthenticated, user } = useUser();
-  const { addFoodEntry } = useHealthData();
+  const { addFoodEntry, userGoals } = useHealthData();
 
   // Load saved diet plans on component mount
   React.useEffect(() => {
@@ -532,7 +532,7 @@ const FoodAnalysis = () => {
         .slice(0, 20); // Last 20 meals
 
       // Use the Gemini service to generate diet plan
-      const result = await generateDailyDietPlan(userProfile, mealHistory);
+      const result = await generateDailyDietPlan(userProfile, mealHistory, userGoals);
 
       toast.dismiss("diet-plan");
 

@@ -462,13 +462,16 @@ class DailyIntakeService {
       const userId = this.getCurrentUserId();
       const docRef = doc(db, 'users', userId, this.collections.goals, 'daily');
       
-      await setDoc(docRef, {
+      // Ensure we're sending a complete goals object
+      const goalsData = {
         ...goals,
         userId,
         updatedAt: serverTimestamp()
-      }, { merge: true });
+      };
       
-      console.log('User goals updated:', goals);
+      await setDoc(docRef, goalsData, { merge: true });
+      
+      console.log('User goals updated:', goalsData);
       return true;
     } catch (error) {
       console.error('Error updating user goals:', error);

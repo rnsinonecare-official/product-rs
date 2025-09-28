@@ -803,6 +803,9 @@ const generateDailyDietPlan = async (
       gender,
       activityLevel = "moderate",
       goals = [],
+      calorieGoal = 2000, // Extract calorie goal with default
+      location = "India", // Extract location with default
+      cuisinePreferences = [] // Extract cuisine preferences
     } = userProfile;
 
     const { cuisineType = [], allergies = [], dislikes = [] } = preferences;
@@ -825,6 +828,9 @@ USER PROFILE:
 - Gender: ${gender || "Not specified"}
 - Activity Level: ${activityLevel}
 - Goals: ${goals.join(", ") || "General health"}
+- Daily Calorie Target: ${calorieGoal} calories
+- Location: ${location}
+- Cuisine Preferences: ${cuisinePreferences.join(", ") || "Any"}
 
 PREFERENCES:
 - Cuisine Types: ${cuisineType.join(", ") || "Any"}
@@ -844,10 +850,10 @@ VARIETY REQUIREMENTS:
 - Seasonal focus: ${seasonalFoods}
 - Variety instruction: ${varietyPrompt}
 
-Please create a detailed daily diet plan with the following structure:
+Please respond with ONLY a valid JSON object in this exact format:
 
 {
-  "dailyCalorieTarget": [appropriate calorie target based on profile],
+  "dailyCalorieTarget": ${calorieGoal},
   "meals": {
     "breakfast": {
       "time": "7:00 AM - 8:00 AM",
@@ -940,6 +946,7 @@ IMPORTANT GUIDELINES:
 7. Ensure nutritional balance across all meals
 8. Provide alternatives for dietary flexibility
 9. ALL NUMBERS MUST BE WHOLE NUMBERS (no decimals) - round all calorie and nutrient values
+10. Respond with ONLY the JSON object, no additional text or explanations
 
 Return ONLY the JSON object, no additional text or explanations.`;
 
@@ -951,15 +958,29 @@ Return ONLY the JSON object, no additional text or explanations.`;
       model: "gemini-2.0-flash-exp",
       contents: prompt,
       generationConfig: {
-        temperature: 0.9, // Increased for more variety
+        maxOutputTokens: 2048,
+        temperature: 0.9,
         topK: 50,
         topP: 0.95,
-        maxOutputTokens: 2048,
       },
     });
 
-    const text = response.response.text();
+    // Check if response exists
+    if (!response) {
+      console.log("❌ No valid response from Google GenAI");
+      throw new Error("Invalid response from AI model");
+    }
+
+    // Get text from response - using the same pattern as working implementations
+    const text = response.text;
     console.log("📝 Raw response received from Google GenAI");
+
+    // Check if text exists
+    if (!text || typeof text !== 'string') {
+      console.log("❌ No valid text in response from Google GenAI");
+      console.log("📝 Response structure:", JSON.stringify(response, null, 2));
+      throw new Error("Invalid response text from AI model");
+    }
 
     // Extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -986,11 +1007,14 @@ Return ONLY the JSON object, no additional text or explanations.`;
       }
     } else {
       console.log("❌ No JSON found in response, creating fallback...");
+      console.log("📝 User Profile for fallback:", JSON.stringify(userProfile, null, 2));
       // Return fallback diet plan
       return createFallbackDietPlan(userProfile, mealHistory);
     }
   } catch (error) {
     console.error("❌ Diet plan generation error:", error);
+    console.log("📝 User Profile for fallback:", JSON.stringify(userProfile, null, 2));
+    console.log("📝 Meal History for fallback:", JSON.stringify(mealHistory, null, 2));
 
     // Return fallback diet plan on error
     return createFallbackDietPlan(userProfile, mealHistory);
@@ -1052,7 +1076,7 @@ const cleanDietPlanNumbers = (dietPlan) => {
 const createFallbackDietPlan = (userProfile = {}, mealHistory = []) => {
   console.log("🔄 Creating fallback diet plan...");
 
-  const { healthConditions = [], dietType = "vegetarian" } = userProfile;
+  const { healthConditions = [], dietType = "vegetarian", calorieGoal = 2000 } = userProfile;
   const isVegetarian = dietType === "vegetarian" || dietType === "vegan";
   
   // Add randomization to fallback plans
@@ -1068,13 +1092,21 @@ const createFallbackDietPlan = (userProfile = {}, mealHistory = []) => {
     ["Avocado toast with egg", "Green smoothie", "Turkey sausage"]
   ];
 
+  const breakfastCalories = Math.round((calorieGoal * 0.25) + (Math.random() * 100 - 50));
+  const midMorningSnackCalories = Math.round(calorieGoal * 0.1);
+  const lunchCalories = Math.round(calorieGoal * 0.3);
+  const eveningSnackCalories = Math.round(calorieGoal * 0.05);
+  const dinnerCalories = Math.round(calorieGoal * 0.3);
+  
+  const totalCalories = breakfastCalories + midMorningSnackCalories + lunchCalories + eveningSnackCalories + dinnerCalories;
+
   return {
-    dailyCalorieTarget: Math.round(2000 + (Math.random() * 400 - 200)), // Vary between 1800-2200, rounded
+    dailyCalorieTarget: calorieGoal, // Use the user's actual calorie goal
     meals: {
       breakfast: {
         time: "7:00 AM - 8:00 AM",
         foods: breakfastOptions[randomIndex],
-        calories: Math.round(350 + (Math.random() * 100 - 50)), // Vary calories, rounded
+        calories: breakfastCalories,
         nutrients: { protein: "12g", carbs: "45g", fat: "8g" },
         preparationTips: [
           "Prepare oats the night before",
@@ -1084,7 +1116,7 @@ const createFallbackDietPlan = (userProfile = {}, mealHistory = []) => {
       midMorningSnack: {
         time: "10:00 AM - 10:30 AM",
         foods: ["Mixed nuts", "Herbal tea"],
-        calories: 150,
+        calories: midMorningSnackCalories,
         nutrients: { protein: "6g", carbs: "8g", fat: "12g" },
       },
       lunch: {
@@ -1092,7 +1124,7 @@ const createFallbackDietPlan = (userProfile = {}, mealHistory = []) => {
         foods: isVegetarian
           ? ["Vegetable salad", "Brown rice", "Dal", "Yogurt"]
           : ["Grilled chicken salad", "Quinoa", "Steamed vegetables"],
-        calories: 450,
+        calories: lunchCalories,
         nutrients: { protein: "18g", carbs: "55g", fat: "12g" },
         preparationTips: [
           "Use olive oil for dressing",
@@ -1102,7 +1134,7 @@ const createFallbackDietPlan = (userProfile = {}, mealHistory = []) => {
       eveningSnack: {
         time: "4:00 PM - 4:30 PM",
         foods: ["Fresh fruit", "Green tea"],
-        calories: 100,
+        calories: eveningSnackCalories,
         nutrients: { protein: "2g", carbs: "25g", fat: "1g" },
       },
       dinner: {
@@ -1110,7 +1142,7 @@ const createFallbackDietPlan = (userProfile = {}, mealHistory = []) => {
         foods: isVegetarian
           ? ["Grilled vegetables", "Quinoa", "Vegetable soup"]
           : ["Grilled fish", "Sweet potato", "Green salad"],
-        calories: 400,
+        calories: dinnerCalories,
         nutrients: { protein: "15g", carbs: "50g", fat: "10g" },
         preparationTips: ["Cook vegetables lightly", "Season with herbs"],
       },
