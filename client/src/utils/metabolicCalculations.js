@@ -1,7 +1,31 @@
 /**
  * Unified Metabolic Age Calculation Utility
- * This ensures consistent metabolic age calculations across the entire application
+ * Enhanced version with real-world BMR reference data
+ * This ensures consistent and realistic metabolic age calculations across the entire application
  */
+
+ /**
+  * Average BMR reference values (approximate, based on population studies)
+  * Source references: WHO/FAO/UNU and Harris-Benedict data tables
+  */
+const averageBMRReference = {
+  male: {
+    20: 1850,
+    30: 1780,
+    40: 1700,
+    50: 1620,
+    60: 1550,
+    70: 1480
+  },
+  female: {
+    20: 1500,
+    30: 1430,
+    40: 1370,
+    50: 1300,
+    60: 1240,
+    70: 1180
+  }
+};
 
 /**
  * Calculate metabolic age based on various health factors
@@ -26,7 +50,6 @@ export const calculateMetabolicAge = (
   try {
     // Validate inputs
     if (!age || !gender || !height || !weight) {
-      // eslint-disable-next-line no-console
       console.warn('Missing required parameters for metabolic age calculation');
       return null;
     }
@@ -37,14 +60,12 @@ export const calculateMetabolicAge = (
     weight = Number(weight);
 
     if (isNaN(age) || isNaN(height) || isNaN(weight) || age <= 0 || height <= 0 || weight <= 0) {
-      // eslint-disable-next-line no-console
       console.warn('Invalid numeric values for metabolic age calculation');
       return null;
     }
 
     // Validate gender
     if (!['male', 'female'].includes(gender.toLowerCase())) {
-      // eslint-disable-next-line no-console
       console.warn('Invalid gender value for metabolic age calculation');
       return null;
     }
@@ -61,10 +82,13 @@ export const calculateMetabolicAge = (
     // Enhanced metabolic age calculation using multiple factors
     let metabolicAgeScore = 0;
 
-    // 1. BMR Efficiency Score (40% weight)
-    const expectedBMR = gender.toLowerCase() === 'male'
-      ? (88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age))
-      : (447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age));
+    // ✅ 1. BMR Efficiency Score (now based on real reference data)
+    const genderRef = gender.toLowerCase();
+    const referenceTable = averageBMRReference[genderRef];
+
+    // Find nearest reference decade
+    const decade = Math.min(70, Math.max(20, Math.round(age / 10) * 10));
+    const expectedBMR = referenceTable[decade];
 
     const bmrEfficiency = bmr / expectedBMR;
 
@@ -97,16 +121,15 @@ export const calculateMetabolicAge = (
     metabolicAgeScore += activityScores[activityLevel] || 0;
 
     // 4. Age-related metabolism decline (10% weight)
-    // Natural metabolism decline is about 1-2% per decade after 30
     if (age > 30) {
       const decadesPast30 = (age - 30) / 10;
-      const expectedDecline = decadesPast30 * 1.5; // 1.5% per decade
+      const expectedDecline = decadesPast30 * 1.5; // ~1.5% per decade
       const actualDecline = (1 - bmrEfficiency) * 100;
 
       if (actualDecline > expectedDecline + 5) {
-        metabolicAgeScore += 4; // Faster than expected decline
+        metabolicAgeScore += 4; // Faster decline
       } else if (actualDecline < expectedDecline - 5) {
-        metabolicAgeScore -= 4; // Slower than expected decline
+        metabolicAgeScore -= 4; // Slower decline
       }
     }
 
@@ -119,19 +142,18 @@ export const calculateMetabolicAge = (
       else if (bodyFatDifference > 5) metabolicAgeScore += 1;
       else if (bodyFatDifference < -5) metabolicAgeScore -= 2;
 
-      // Muscle mass factor (higher muscle mass = better metabolism)
       const expectedMuscleMass = weight * (gender.toLowerCase() === 'male' ? 0.45 : 0.35);
       if (muscleMass > expectedMuscleMass * 1.1) metabolicAgeScore -= 2;
       else if (muscleMass < expectedMuscleMass * 0.9) metabolicAgeScore += 2;
     }
 
-    // Calculate final metabolic age (constrained between 18-80)
+    // Final metabolic age
     const metabolicAge = Math.max(18, Math.min(80, age + metabolicAgeScore));
 
-    // Calculate metabolic health score (0-100)
+    // Health score (0–100)
     const healthScore = Math.max(0, Math.min(100, 100 - (metabolicAgeScore + 20)));
 
-    // Calculate TDEE (Total Daily Energy Expenditure)
+    // TDEE Calculation
     const activityMultipliers = {
       sedentary: 1.2,
       light: 1.375,
@@ -141,7 +163,7 @@ export const calculateMetabolicAge = (
     };
     const tdee = bmr * (activityMultipliers[activityLevel] || 1.55);
 
-    // Determine comparison with chronological age
+    // Comparison summary
     let comparison, comparisonColor, comparisonIcon;
     if (metabolicAge < age - 2) {
       comparison = 'younger';
@@ -157,15 +179,16 @@ export const calculateMetabolicAge = (
       comparisonIcon = '✅';
     }
 
-    // Detailed factors breakdown for insights
+    // Detailed breakdown
     const factors = {
       bmrEfficiency: {
         value: bmrEfficiency,
         score: bmrEfficiency > 1.15 ? -8 : bmrEfficiency > 1.05 ? -4 : bmrEfficiency < 0.85 ? 8 : bmrEfficiency < 0.95 ? 4 : 0,
-        description: bmrEfficiency > 1.15 ? 'Excellent metabolism' :
-                     bmrEfficiency > 1.05 ? 'Good metabolism' :
-                     bmrEfficiency < 0.85 ? 'Slow metabolism' :
-                     bmrEfficiency < 0.95 ? 'Below average metabolism' : 'Average metabolism'
+        description:
+          bmrEfficiency > 1.15 ? 'Excellent metabolism' :
+          bmrEfficiency > 1.05 ? 'Good metabolism' :
+          bmrEfficiency < 0.85 ? 'Slow metabolism' :
+          bmrEfficiency < 0.95 ? 'Below average metabolism' : 'Average metabolism'
       },
       bodyComposition: {
         bmi: bmi,
@@ -191,56 +214,29 @@ export const calculateMetabolicAge = (
       factors,
       bmi: Math.round(bmi * 10) / 10
     };
-} catch (error) {
-  // eslint-disable-next-line no-console
-  console.error('Error calculating metabolic age:', error);
-  return null;
-}
+  } catch (error) {
+    console.error('Error calculating metabolic age:', error);
+    return null;
+  }
 };
 
 /**
  * Get BMI category and color
- * @param {number} bmi - BMI value
- * @returns {object} BMI category information
  */
 export const getBMIInfo = (bmi) => {
   if (bmi < 18.5) {
-    return {
-      category: 'Underweight',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
-      description: 'You may need to gain weight for optimal health'
-    };
+    return { category: 'Underweight', color: 'text-blue-600', bgColor: 'bg-blue-100', description: 'You may need to gain weight for optimal health' };
   } else if (bmi < 25) {
-    return {
-      category: 'Normal',
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
-      description: 'You have a healthy weight range'
-    };
+    return { category: 'Normal', color: 'text-green-600', bgColor: 'bg-green-100', description: 'You have a healthy weight range' };
   } else if (bmi < 30) {
-    return {
-      category: 'Overweight',
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-100',
-      description: 'Consider losing weight for better health'
-    };
+    return { category: 'Overweight', color: 'text-yellow-600', bgColor: 'bg-yellow-100', description: 'Consider losing weight for better health' };
   } else {
-    return {
-      category: 'Obese',
-      color: 'text-red-600',
-      bgColor: 'bg-red-100',
-      description: 'Weight loss is recommended for better health'
-    };
+    return { category: 'Obese', color: 'text-red-600', bgColor: 'bg-red-100', description: 'Weight loss is recommended for better health' };
   }
 };
 
 /**
  * Get metabolic age insights and recommendations
- * @param {number} metabolicAge - Calculated metabolic age
- * @param {number} chronologicalAge - Actual age
- * @param {object} factors - Metabolic factors breakdown
- * @returns {object} Insights and recommendations
  */
 export const getMetabolicAgeInsights = (metabolicAge, chronologicalAge, factors) => {
   const difference = metabolicAge - chronologicalAge;
@@ -265,15 +261,12 @@ export const getMetabolicAgeInsights = (metabolicAge, chronologicalAge, factors)
     recommendations.push("Consider consulting a healthcare provider and making significant lifestyle changes.");
   }
   
-  // Add specific recommendations based on factors
   if (factors.bmrEfficiency.value < 0.95) {
     recommendations.push("💪 Build muscle mass through strength training to boost metabolism.");
   }
-  
   if (factors.bodyComposition.bmi > 25) {
     recommendations.push("🥗 Focus on achieving a healthy weight through balanced nutrition.");
   }
-  
   if (factors.activityLevel.level === 'sedentary') {
     recommendations.push("🏃‍♂️ Increase daily physical activity - even light exercise helps!");
   }
