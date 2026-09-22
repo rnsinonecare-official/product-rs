@@ -2,12 +2,11 @@
 
 ## 🚀 AI Features Overview
 
-This app now uses **Google Gemini AI** for comprehensive food analysis and recipe generation. All features are powered by AI instead of manual data entry.
+This app uses **AWS Bedrock** (Kimi K2.5 with a model fallback chain) for comprehensive food analysis and recipe generation. All AI calls are made server-side by the backend — the frontend holds no AI keys.
 
-### 🔑 API Key Configuration
-- **Current API Key**: `REDACTED_KEY`
-- **Location**: `.env` file in the project root
-- **Environment Variable**: `REACT_APP_GEMINI_API_KEY`
+### 🔑 Configuration
+- AI runs entirely on the backend via AWS Bedrock; there is **no AI API key in the frontend**.
+- Backend selects models via `BEDROCK_TEXT_CHAIN` / `BEDROCK_IMAGE_CHAIN` (see `VERCEL_DEPLOYMENT.md`).
 
 ---
 
