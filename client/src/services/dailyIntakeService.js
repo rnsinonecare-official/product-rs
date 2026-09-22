@@ -70,4 +70,5 @@ class DailyIntakeService {
   }
 }
 
-export default new DailyIntakeService();
+const dailyIntakeService = new DailyIntakeService();
+export default dailyIntakeService;

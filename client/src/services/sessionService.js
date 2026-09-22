@@ -2,7 +2,6 @@
 // Auth via Cognito; session analytics persisted via the backend API (no direct DB).
 import { auth } from '../firebase/config';
 import api from './api';
-import storageService from './storageService';
 
 class SessionService {
   constructor() {

@@ -11,7 +11,7 @@ import {
   AuthenticationDetails,
 } from "amazon-cognito-identity-js";
 
-const REGION = process.env.REACT_APP_COGNITO_REGION;
+// Region is inferred by amazon-cognito-identity-js from the user-pool ID.
 const USER_POOL_ID = process.env.REACT_APP_COGNITO_USER_POOL_ID;
 const CLIENT_ID = process.env.REACT_APP_COGNITO_CLIENT_ID;
 
