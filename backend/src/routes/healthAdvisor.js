@@ -4,7 +4,7 @@ const rateLimit = require("express-rate-limit");
 const { asyncHandler, AppError } = require("../middleware/errorHandler");
 const { limitTextInput } = require("../middleware/inputLimit");
 const { db } = require("../config/firebase");
-const geminiService = require("../services/geminiService");
+const bedrockService = require("../services/bedrockService");
 
 const router = express.Router();
 
@@ -89,27 +89,24 @@ const getUserDataForRAG = async (userId) => {
  */
 const generateHealthAdvisorResponse = async (message, userData) => {
   try {
-    console.log("🔄 Using Gemini service with character limits...");
-    
-    // Create a custom prompt that enforces character limits
-    const limitedPrompt = `You are a nutrition expert. Answer this health question in EXACTLY 300-400 characters (including spaces). Be concise but helpful: "${message}"`;
-    
-    // Use Gemini directly with character limit
-    const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
-      generationConfig: {
-        maxOutputTokens: 100, // Limit tokens to keep response short
-        temperature: 0.7,
-        topP: 0.8,
-        topK: 40,
-      }
+    console.log("🔄 Using Bedrock with character limits...");
+
+    // Build a short prompt that enforces character limits; include the user's
+    // health conditions for context when available.
+    const conditions =
+      userData && userData.profile && (userData.profile.healthConditions || []).length
+        ? ` The user has these health conditions: ${userData.profile.healthConditions.join(", ")}.`
+        : "";
+    const limitedPrompt = `You are a nutrition expert. Answer this health question in EXACTLY 300-400 characters (including spaces). Be concise but helpful.${conditions} Question: "${message}"`;
+
+    // Use Bedrock (Converse) with a small token cap to keep the response short.
+    const response = await bedrockService.converse({
+      chain: bedrockService.TEXT_CHAIN,
+      messages: [{ role: "user", content: [{ text: limitedPrompt }] }],
+      maxTokens: 150,
+      temperature: 0.7,
     });
-    
-    const result = await model.generateContent(limitedPrompt);
-    const response = result.response.text();
-    
+
     // Ensure response is within 300-400 character limit
     let limitedResponse = response.trim();
     if (limitedResponse.length > 400) {

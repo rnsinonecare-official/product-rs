@@ -16,6 +16,7 @@ const aiRoutes = require("./routes/ai");
 const userRoutes = require("./routes/user");
 const adminRoutes = require("./routes/admin");
 const healthAdvisorRoutes = require("./routes/healthAdvisor");
+const dataRoutes = require("./routes/data");
 // const tempIntakeRoutes = require('./routes/tempIntake'); // Removed - using Firestore directly
 
 // Import middleware
@@ -79,11 +80,10 @@ app.use(morgan("combined"));
 app.get("/health", async (req, res) => {
   try {
     // Test Firestore connectivity
-    const admin = require("firebase-admin");
-    const db = admin.firestore();
+    const { db } = require("./config/firebase");
 
     // Perform a simple Firestore operation to test connectivity
-    await db.collection("healthCheck").limit(1).get();
+    await db.collection("users").limit(1).get();
 
     res.status(200).json({
       status: "OK",
@@ -92,10 +92,10 @@ app.get("/health", async (req, res) => {
       uptime: process.uptime(),
       environment: process.env.NODE_ENV || "development",
       version: "1.0.0",
-      firestore: "connected",
+      database: "connected",
     });
   } catch (error) {
-    console.error("Firestore health check failed:", error);
+    console.error("DynamoDB health check failed:", error);
     res.status(200).json({
       status: "OK",
       message: "Rainscare Backend Server is running",
@@ -103,8 +103,8 @@ app.get("/health", async (req, res) => {
       uptime: process.uptime(),
       environment: process.env.NODE_ENV || "development",
       version: "1.0.0",
-      firestore: "disconnected",
-      warnings: ["Firestore connection test failed"],
+      database: "disconnected",
+      warnings: ["DynamoDB connection test failed"],
     });
   }
 });
@@ -112,11 +112,10 @@ app.get("/health", async (req, res) => {
 app.get("/api/health", async (req, res) => {
   try {
     // Test Firestore connectivity
-    const admin = require("firebase-admin");
-    const db = admin.firestore();
+    const { db } = require("./config/firebase");
 
     // Perform a simple Firestore operation to test connectivity
-    await db.collection("healthCheck").limit(1).get();
+    await db.collection("users").limit(1).get();
 
     res.status(200).json({
       status: "healthy",
@@ -125,9 +124,9 @@ app.get("/api/health", async (req, res) => {
       environment: process.env.NODE_ENV || "development",
       version: "1.0.0",
       services: {
-        firebase: "connected",
-        firestore: "connected",
-        gemini: process.env.GEMINI_API_KEY ? "configured" : "not configured",
+        cognito: process.env.COGNITO_USER_POOL_ID ? "configured" : "not configured",
+        database: "connected",
+        bedrock: "configured",
         edamam: process.env.EDAMAM_APP_ID ? "configured" : "not configured",
         spoonacular: process.env.SPOONACULAR_API_KEY
           ? "configured"
@@ -135,7 +134,7 @@ app.get("/api/health", async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Firestore health check failed:", error);
+    console.error("DynamoDB health check failed:", error);
     res.status(200).json({
       status: "healthy",
       timestamp: new Date().toISOString(),
@@ -143,15 +142,15 @@ app.get("/api/health", async (req, res) => {
       environment: process.env.NODE_ENV || "development",
       version: "1.0.0",
       services: {
-        firebase: "connected",
-        firestore: "disconnected",
-        gemini: process.env.GEMINI_API_KEY ? "configured" : "not configured",
+        cognito: process.env.COGNITO_USER_POOL_ID ? "configured" : "not configured",
+        database: "disconnected",
+        bedrock: "configured",
         edamam: process.env.EDAMAM_APP_ID ? "configured" : "not configured",
         spoonacular: process.env.SPOONACULAR_API_KEY
           ? "configured"
           : "not configured",
       },
-      warnings: ["Firestore connection test failed"],
+      warnings: ["DynamoDB connection test failed"],
     });
   }
 });
@@ -170,6 +169,7 @@ app.use("/api/health", authMiddleware, healthMetricsRoutes);
 app.use("/api/ai", authMiddleware, aiRoutes);
 app.use("/api/user", authMiddleware, userRoutes);
 app.use("/api/health-advisor", authMiddleware, healthAdvisorRoutes);
+app.use("/api/data", authMiddleware, dataRoutes);
 
 // Protect admin management endpoints with adminAuth middleware
 app.use("/api/admin", adminAuth, adminRoutes);
@@ -178,8 +178,7 @@ app.use("/api/admin", adminAuth, adminRoutes);
 // Public endpoint for updates
 app.get("/api/updates/active", async (req, res) => {
   try {
-    const admin = require("firebase-admin");
-    const db = admin.firestore();
+    const { db } = require("./config/firebase");
 
     // First try to get all updates, then filter
     const snapshot = await db.collection("updates").get();

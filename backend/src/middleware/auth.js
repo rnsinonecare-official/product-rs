@@ -1,97 +1,81 @@
-const { auth } = require('../config/firebase');
+const { jwtVerifier } = require("../config/aws");
 
 /**
- * Authentication middleware to verify Firebase ID tokens
+ * Map a verified Cognito ID-token payload to the req.user shape the app uses.
+ * (uid was the Firebase UID; it is now the Cognito `sub`.)
+ */
+function toUser(payload) {
+  return {
+    uid: payload.sub,
+    email: payload.email,
+    emailVerified: payload.email_verified === true || payload.email_verified === "true",
+    name: payload.name || payload["cognito:username"],
+    picture: payload.picture,
+    claims: payload,
+  };
+}
+
+/**
+ * Authentication middleware — verifies a Cognito ID token.
  */
 const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
-        error: 'Unauthorized',
-        message: 'No valid authorization token provided'
+        error: "Unauthorized",
+        message: "No valid authorization token provided",
       });
     }
 
-    const idToken = authHeader.split('Bearer ')[1];
-    
+    const idToken = authHeader.split("Bearer ")[1];
     if (!idToken) {
-      return res.status(401).json({
-        error: 'Unauthorized',
-        message: 'No token provided'
+      return res
+        .status(401)
+        .json({ error: "Unauthorized", message: "No token provided" });
+    }
+
+    if (!jwtVerifier) {
+      return res.status(500).json({
+        error: "Server misconfiguration",
+        message: "Cognito verifier is not configured",
       });
     }
 
-    // Verify the ID token
-    const decodedToken = await auth.verifyIdToken(idToken);
-    
-    // Add user info to request object
-    req.user = {
-      uid: decodedToken.uid,
-      email: decodedToken.email,
-      emailVerified: decodedToken.email_verified,
-      name: decodedToken.name,
-      picture: decodedToken.picture,
-      firebase: decodedToken
-    };
-
+    const payload = await jwtVerifier.verify(idToken);
+    req.user = toUser(payload);
     next();
   } catch (error) {
-    console.error('Authentication error:', error);
-    
-    let message = 'Invalid token';
-    let statusCode = 401;
-
-    if (error.code === 'auth/id-token-expired') {
-      message = 'Token has expired';
-    } else if (error.code === 'auth/id-token-revoked') {
-      message = 'Token has been revoked';
-    } else if (error.code === 'auth/invalid-id-token') {
-      message = 'Invalid token format';
-    }
-
-    return res.status(statusCode).json({
-      error: 'Unauthorized',
-      message,
-      code: error.code
-    });
+    console.error("Authentication error:", error.message);
+    let message = "Invalid token";
+    if (/expired/i.test(error.message)) message = "Token has expired";
+    else if (/revoked/i.test(error.message)) message = "Token has been revoked";
+    return res
+      .status(401)
+      .json({ error: "Unauthorized", message });
   }
 };
 
 /**
- * Optional authentication middleware - doesn't fail if no token provided
+ * Optional authentication — never fails; sets req.user to null when absent/invalid.
  */
 const optionalAuthMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       req.user = null;
       return next();
     }
-
-    const idToken = authHeader.split('Bearer ')[1];
-    
-    if (!idToken) {
+    const idToken = authHeader.split("Bearer ")[1];
+    if (!idToken || !jwtVerifier) {
       req.user = null;
       return next();
     }
-
-    const decodedToken = await auth.verifyIdToken(idToken);
-    
-    req.user = {
-      uid: decodedToken.uid,
-      email: decodedToken.email,
-      emailVerified: decodedToken.email_verified,
-      name: decodedToken.name,
-      picture: decodedToken.picture,
-      firebase: decodedToken
-    };
-
+    const payload = await jwtVerifier.verify(idToken);
+    req.user = toUser(payload);
     next();
   } catch (error) {
-    console.error('Optional authentication error:', error);
     req.user = null;
     next();
   }
@@ -99,5 +83,5 @@ const optionalAuthMiddleware = async (req, res, next) => {
 
 module.exports = {
   authMiddleware,
-  optionalAuthMiddleware
+  optionalAuthMiddleware,
 };

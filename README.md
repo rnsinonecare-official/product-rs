@@ -57,21 +57,29 @@ chmod +x deploy.sh
 
 Set these in your Vercel project settings:
 
-### Backend Variables:
+See **VERCEL_DEPLOYMENT.md** for the full list. Summary:
+
+### Backend Variables (secrets — backend project only):
 ```
 NODE_ENV=production
-ADMIN_API_KEY=rainscare_admin_key_2024
-FIREBASE_PROJECT_ID=your-firebase-project-id
-FIREBASE_PRIVATE_KEY=your-firebase-private-key
-FIREBASE_CLIENT_EMAIL=your-firebase-client-email
-GOOGLE_AI_API_KEY=your-google-ai-key
-GEMINI_API_KEY=your-gemini-api-key
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=<rainscare-backend IAM key>
+AWS_SECRET_ACCESS_KEY=<secret>
+COGNITO_USER_POOL_ID=us-east-1_dGaDJKXsX
+COGNITO_CLIENT_ID=2vguuqadsakmgtjohpftatmfuk
+DDB_TABLE_PREFIX=rainscare-
+S3_BUCKET=rainscare-media-uploads
+BEDROCK_TEXT_CHAIN=moonshotai.kimi-k2.5,amazon.nova-pro-v1:0,deepseek.v3.2,mistral.mistral-large-3-675b-instruct,zai.glm-5
+BEDROCK_IMAGE_CHAIN=moonshotai.kimi-k2.5,amazon.nova-pro-v1:0,mistral.mistral-large-3-675b-instruct
+ADMIN_API_KEY=<rotated>  ADMIN_ID=<rotated>  ADMIN_PASSWORD_HASH=<bcrypt hash>
 ```
 
-### Frontend Variables:
+### Frontend Variables (PUBLIC only — no secrets):
 ```
-REACT_APP_API_URL=https://your-vercel-url.vercel.app/api
-REACT_APP_ENVIRONMENT=production
+REACT_APP_API_URL=https://your-backend.vercel.app/api
+REACT_APP_COGNITO_REGION=us-east-1
+REACT_APP_COGNITO_USER_POOL_ID=us-east-1_dGaDJKXsX
+REACT_APP_COGNITO_CLIENT_ID=2vguuqadsakmgtjohpftatmfuk
 ```
 
 ## 📱 Features
@@ -92,10 +100,11 @@ REACT_APP_ENVIRONMENT=production
 
 ### ⚙️ Backend API
 - **RESTful API**: Complete REST API for all app functionality
-- **Firebase Integration**: User authentication and data storage
-- **AI Services**: Google Gemini integration for food analysis
+- **AWS Cognito**: User authentication (JWT verified server-side)
+- **AWS DynamoDB**: All data storage (accessed only via the backend)
+- **AWS Bedrock**: AI food analysis & recipes (Kimi K2.5 + model fallback chain)
+- **AWS S3**: Media/image storage
 - **Admin APIs**: Comprehensive admin management endpoints
-- **Real-time Data**: Live analytics and user data
 
 ## 🌐 Live URLs
 
@@ -107,20 +116,17 @@ After deployment, your app will be available at:
 
 ## 🔐 Admin Access
 
-**Default Admin Credentials:**
-- **Username**: `admin`
-- **Password**: `admin123`
-- **API Key**: `rainscare_admin_key_2024`
+**Admin credentials are set via environment variables** (`ADMIN_ID`, `ADMIN_PASSWORD_HASH`, `ADMIN_API_KEY`) — never hard-coded.
 
-⚠️ **Change these credentials after first login!**
+⚠️ The previously-committed admin credentials are considered **compromised** and must be rotated (new `ADMIN_API_KEY`, new `ADMIN_ID`, and a fresh bcrypt `ADMIN_PASSWORD_HASH`) in Vercel.
 
 ## 🛠️ Local Development
 
 ### Prerequisites
 - Node.js 18+
 - npm or yarn
-- Firebase project
-- Google AI API key
+- AWS account with Cognito, DynamoDB, S3, and Bedrock (model access) — see `CLAUDE.md`
+- AWS credentials for the backend (IAM user `rainscare-backend`)
 
 ### Setup
 ```bash
@@ -158,8 +164,8 @@ npm run dev
 ### Backend
 - **Node.js**: JavaScript runtime
 - **Express.js**: Web framework
-- **Firebase Admin**: Database and auth
-- **Google AI**: Gemini integration
+- **AWS SDK v3**: DynamoDB, Cognito, S3, Bedrock
+- **aws-jwt-verify**: Cognito token verification
 - **Multer**: File upload handling
 - **CORS**: Cross-origin requests
 
@@ -172,7 +178,9 @@ npm run dev
 
 ## 🔒 Security Features
 
-- **Firebase Authentication**: Secure user auth
+- **AWS Cognito**: Secure user auth (SRP; tokens verified server-side)
+- **No secrets in the frontend**: browser holds only public Cognito/API config; all AWS credentials stay in the backend
+- **All DB access via backend**: the browser never touches DynamoDB directly
 - **API Key Protection**: Admin API security
 - **CORS Configuration**: Secure cross-origin requests
 - **Input Validation**: Server-side validation
@@ -201,7 +209,7 @@ This project is licensed under the MIT License.
 
 Need help? Check out:
 - [Vercel Documentation](https://vercel.com/docs)
-- [Firebase Documentation](https://firebase.google.com/docs)
+- [AWS Documentation](https://docs.aws.amazon.com/)
 - [React Documentation](https://reactjs.org/docs)
 
 ## 🎉 Success!
@@ -210,7 +218,7 @@ Your Rainscare platform is now live! 🚀
 
 **Next Steps:**
 1. Update environment variables with your actual values
-2. Configure Firebase security rules
+2. Confirm AWS resources (Cognito/DynamoDB/S3/Bedrock) and IAM scoping
 3. Set up custom domain (optional)
 4. Monitor performance and usage
 5. Add your own branding and content

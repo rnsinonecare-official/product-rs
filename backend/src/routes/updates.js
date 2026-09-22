@@ -4,7 +4,7 @@ const router = express.Router();
 // Get active updates (public endpoint)
 router.get('/active', async (req, res) => {
   try {
-    const admin = require('firebase-admin');
+    const { admin } = require('../config/firebase');
     const db = admin.firestore();
 
     // First try to get all updates, then filter

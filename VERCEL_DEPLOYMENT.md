@@ -1,69 +1,61 @@
-# Vercel Deployment Guide
+# Vercel Deployment Guide (AWS backend)
 
-Deploy your Rainscare Health Platform on Vercel with separate projects for backend, frontend, and admin.
+Rainscare runs as **three separate Vercel projects** (backend, client, admin). Hosting is Vercel; all data/auth/AI/storage are on **AWS** (Cognito, DynamoDB, Bedrock, S3) in account `744488454775`, region `us-east-1`.
 
-## 🚀 Quick Deployment Steps
+> 🔒 **Security:** Never commit secrets. Set all values below in the Vercel dashboard (Project → Settings → Environment Variables). Only the backend holds AWS credentials — the client/admin get **public** config only.
 
-### 1. Backend Deployment
+## 1. Backend project (`/backend`)
 
-1. **Create new Vercel project** from `/backend` folder
-2. **Add environment variables** from `backend/vercel-env-vars.txt`
-3. **Encode Firebase service account:**
-   ```bash
-   cat backend/config/service-account.json | base64 -w 0
-   ```
-   Add this as `GOOGLE_SERVICE_ACCOUNT_KEY` in Vercel
-4. **Deploy** - Vercel will automatically use `vercel.json` config
+Environment variables:
 
-### 2. Frontend Deployment
+| Key | Value |
+|---|---|
+| `AWS_REGION` | `us-east-1` |
+| `AWS_ACCESS_KEY_ID` | access key for the `rainscare-backend` IAM user |
+| `AWS_SECRET_ACCESS_KEY` | its secret (secret — Vercel only) |
+| `COGNITO_USER_POOL_ID` | `us-east-1_dGaDJKXsX` |
+| `COGNITO_CLIENT_ID` | `2vguuqadsakmgtjohpftatmfuk` |
+| `DDB_TABLE_PREFIX` | `rainscare-` |
+| `S3_BUCKET` | `rainscare-media-uploads` |
+| `BEDROCK_TEXT_CHAIN` | `moonshotai.kimi-k2.5,amazon.nova-pro-v1:0,deepseek.v3.2,mistral.mistral-large-3-675b-instruct,zai.glm-5` |
+| `BEDROCK_IMAGE_CHAIN` | `moonshotai.kimi-k2.5,amazon.nova-pro-v1:0,mistral.mistral-large-3-675b-instruct` |
+| `ADMIN_API_KEY` | rotated admin key (secret) |
+| `ADMIN_ID` | rotated admin id |
+| `ADMIN_PASSWORD_HASH` | bcrypt hash of the new admin password |
+| `FRONTEND_URL` | the client's Vercel URL (for CORS) |
+| `EDAMAM_APP_ID` / `EDAMAM_APP_KEY` / `SPOONACULAR_API_KEY` | only if those food APIs are used |
 
-1. **Create new Vercel project** from `/client` folder
-2. **Add environment variables** from `client/vercel-env-vars.txt`
-3. **Update `REACT_APP_API_URL`** with your backend Vercel URL
-4. **Deploy** - Vercel will build and deploy React app
+Deploy — Vercel uses `backend/vercel.json` (Node runtime, entry `src/server.js`).
 
-### 3. Admin Panel Deployment
+## 2. Client project (`/client`)
 
-1. **Create new Vercel project** from `/admin` folder
-2. **Add environment variables** from `admin/vercel-env-vars.txt`
-3. **Update `REACT_APP_API_URL`** with your backend Vercel URL
-4. **Deploy** - Vercel will build and deploy admin panel
+**Public config only — no secrets:**
 
-## 📝 Environment Variables Setup
+| Key | Value |
+|---|---|
+| `REACT_APP_API_URL` | `https://<backend>.vercel.app/api` |
+| `REACT_APP_COGNITO_REGION` | `us-east-1` |
+| `REACT_APP_COGNITO_USER_POOL_ID` | `us-east-1_dGaDJKXsX` |
+| `REACT_APP_COGNITO_CLIENT_ID` | `2vguuqadsakmgtjohpftatmfuk` |
+| `REACT_APP_ADMIN_URL` | the admin app's Vercel URL |
 
-### Backend (Copy from `backend/vercel-env-vars.txt`)
-- All your current environment variables
-- `GOOGLE_SERVICE_ACCOUNT_KEY` (base64 encoded Firebase service account)
-- `FRONTEND_URL` (your frontend Vercel URL)
+## 3. Admin project (`/admin`)
 
-### Frontend (Copy from `client/vercel-env-vars.txt`)
-- `REACT_APP_API_URL` (your backend Vercel URL + `/api`)
-- All Firebase configuration variables
+The admin app talks only to the backend API (no Firebase, no AWS creds):
 
-### Admin (Copy from `admin/vercel-env-vars.txt`)
-- `REACT_APP_API_URL` (your backend Vercel URL + `/api`)
-- `REACT_APP_ADMIN_API_KEY`
-- All Firebase configuration variables
+| Key | Value |
+|---|---|
+| `REACT_APP_API_URL` | `https://<backend>.vercel.app/api` |
+| `REACT_APP_ADMIN_API_KEY` | the rotated admin key |
 
-## 🔗 URL Structure
+## Order
 
-After deployment, you'll have:
-- **Backend:** `https://your-backend.vercel.app`
-- **Frontend:** `https://your-frontend.vercel.app`
-- **Admin:** `https://your-admin.vercel.app`
+1. Deploy **backend** first → note its URL.
+2. Set `REACT_APP_API_URL` on client + admin to `<backend-url>/api`, deploy them.
+3. Set `FRONTEND_URL` on the backend to the client URL (CORS), redeploy backend.
 
-## ⚠️ Important Notes
+## URLs
 
-1. **Deploy backend first** to get the API URL
-2. **Update frontend and admin** with the backend URL
-3. **Update backend** with the frontend URL for CORS
-4. **Firebase service account** must be base64 encoded for Vercel
-5. **All projects are separate** - deploy each folder individually
-
-## 🔧 Vercel Configuration Files
-
-- `vercel.json` files are already created for each component
-- Backend uses Node.js runtime
-- Frontend/Admin use static build with React Router support
-
-That's it! Your app will be live on Vercel with separate URLs for each component.
+- Backend: `https://<backend>.vercel.app`
+- Client: `https://<client>.vercel.app`
+- Admin: `https://<admin>.vercel.app`

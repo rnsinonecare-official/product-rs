@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const admin = require('firebase-admin');
+const { admin } = require('../config/firebase');
 
 const BLOGS_FILE = path.join(__dirname, '../../data/blogs.json');
 

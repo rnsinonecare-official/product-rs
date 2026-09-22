@@ -1,46 +1,35 @@
-// Authentication Service with Real Firebase
+// Authentication Service — AWS Cognito (auth) + backend API (all profile DB ops).
+// No Firebase, no direct database access from the browser.
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
-  sendPasswordResetEmail,
-  GoogleAuthProvider,
-  signInWithPopup
-} from 'firebase/auth';
-import {
-  doc,
-  setDoc,
-  getDoc,
-  updateDoc,
-  serverTimestamp
-} from 'firebase/firestore';
-import { auth, db } from '../firebase/config';
-import storageService from './storageService';
-import sessionService from './sessionService';
+  signIn,
+  signOutUser,
+  forgotPassword,
+  confirmPassword,
+  onAuthStateChange as cognitoOnAuthStateChange,
+} from "../aws/cognitoAuth";
+import { authAPI } from "./api";
+import storageService from "./storageService";
+import sessionService from "./sessionService";
 
-// Google Auth Provider
-// const googleProvider = new GoogleAuthProvider();
-
-// Create user account and profile
+// Register: create the Cognito user via backend, sign in, then save the profile.
 export const registerUser = async (email, password, userData) => {
   try {
-    console.log('Attempting to register user:', email);
-    
-    // Create Firebase auth user
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    console.log("Registering user:", email);
 
-    // Update auth profile
-    await updateProfile(user, {
-      displayName: userData.name
+    // 1) Create the Cognito account (server-side admin create → confirmed user)
+    await authAPI.createUser({
+      email,
+      password,
+      displayName: userData.name,
     });
 
-    // Create user document in Firestore
-    const userDocData = {
+    // 2) Sign in to obtain tokens (SRP)
+    const user = await signIn(email, password);
+
+    // 3) Persist the full profile via the backend (never write the DB directly)
+    const profile = {
       uid: user.uid,
-      email: user.email,
+      email,
       name: userData.name,
       age: userData.age,
       gender: userData.gender,
@@ -50,328 +39,164 @@ export const registerUser = async (email, password, userData) => {
       dietType: userData.dietType,
       bmi: userData.bmi,
       bmiCategory: userData.bmiCategory,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      isProfileComplete: userData.isProfileComplete !== false, // Default to true unless explicitly false
-      preferences: {
-        notifications: true,
-        dataSharing: false,
-        units: 'metric'
-      },
-      goals: userData.age ? {
-        dailyCalories: calculateDailyCalories(userData),
-        dailyWater: 8, // glasses
-        dailySteps: 10000,
-        weeklyWeightLoss: 0.5 // kg
-      } : null // Only calculate goals if we have complete data
+      isProfileComplete: userData.isProfileComplete !== false,
+      preferences: { notifications: true, dataSharing: false, units: "metric" },
+      goals: userData.age
+        ? {
+            dailyCalories: calculateDailyCalories(userData),
+            dailyWater: 8,
+            dailySteps: 10000,
+            weeklyWeightLoss: 0.5,
+          }
+        : null,
     };
 
-    await setDoc(doc(db, 'users', user.uid), userDocData);
+    await authAPI.updateProfile(profile);
 
-    return {
-      user: user,
-      profile: userDocData
-    };
+    return { user, profile };
   } catch (error) {
-    console.error('Registration error:', error);
-    throw new Error(getFirebaseErrorMessage(error.code));
+    console.error("Registration error:", error);
+    throw new Error(getAuthErrorMessage(error));
   }
 };
 
-// Sign in user
+// Sign in and load the profile from the backend.
 export const loginUser = async (email, password) => {
   try {
-    console.log('Attempting to login user:', email);
-    
-    // Sign in with Firebase
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    console.log("Logging in user:", email);
+    const user = await signIn(email, password);
 
-    // Get user profile from Firestore
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
     let profile = null;
-    
-    if (userDoc.exists()) {
-      profile = userDoc.data();
-    } else {
-      // If profile doesn't exist, create a minimal one
+    try {
+      const res = await authAPI.getProfile();
+      profile = res.data.user;
+    } catch (e) {
+      // No profile yet — create a minimal one via the backend
       profile = {
-        name: user.displayName || 'User',
+        name: user.displayName || "User",
         email: user.email,
         isProfileComplete: false,
         uid: user.uid,
-        createdAt: serverTimestamp()
       };
-      
-      // Save the minimal profile
-      await setDoc(doc(db, 'users', user.uid), profile);
+      await authAPI.updateProfile(profile);
     }
 
-    return {
-      user: user,
-      profile: profile
-    };
+    return { user, profile };
   } catch (error) {
-    console.error('Login error:', error);
-    throw new Error(getFirebaseErrorMessage(error.code));
+    console.error("Login error:", error);
+    throw new Error(getAuthErrorMessage(error));
   }
 };
 
-// Sign in with Google
+// Google sign-in has been removed (no Google dependency).
 export const loginWithGoogle = async () => {
-  try {
-    console.log('Attempting Google login');
-    
-    const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-
-    // Check if user profile exists in Firestore
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    let profile;
-    
-    if (userDoc.exists()) {
-      profile = userDoc.data();
-    } else {
-      // Create new profile for Google user
-      profile = {
-        name: user.displayName || 'Google User',
-        email: user.email,
-        photoURL: user.photoURL,
-        isProfileComplete: false, // New Google user needs onboarding
-        uid: user.uid,
-        healthConditions: [],
-        dietType: null,
-        createdAt: serverTimestamp()
-      };
-      
-      // Save profile to Firestore
-      await setDoc(doc(db, 'users', user.uid), profile);
-    }
-    
-    return {
-      user: user,
-      profile: profile
-    };
-  } catch (error) {
-    console.error('Google login error:', error);
-    throw new Error('Google authentication failed');
-  }
+  throw new Error("Google sign-in is not available. Please use email and password.");
 };
 
-// Sign out user
+// Sign out.
 export const logoutUser = async () => {
   try {
-    console.log('Logging out user');
-
-    // Track logout in session service
-    await sessionService.manualLogout();
-
-    // Clear all cached user data before signing out
+    try {
+      await sessionService.manualLogout();
+    } catch (e) {
+      /* non-fatal */
+    }
     storageService.clearAllUserData();
-
-    await signOut(auth);
-    console.log('✅ User logged out successfully');
+    await signOutUser();
     return true;
   } catch (error) {
-    console.error('Logout error:', error);
-    // Still clear local data even if Firebase logout fails
+    console.error("Logout error:", error);
     storageService.clearAllUserData();
-    throw new Error('Failed to logout');
+    throw new Error("Failed to logout");
   }
 };
 
-// Reset password
+// Initiate a password reset (emails a verification code).
 export const resetPassword = async (email) => {
   try {
-    console.log('Password reset requested for:', email);
-    await sendPasswordResetEmail(auth, email);
+    await forgotPassword(email);
     return true;
   } catch (error) {
-    console.error('Password reset error:', error);
-    throw new Error('Failed to send password reset email');
+    console.error("Password reset error:", error);
+    throw new Error("Failed to send password reset email");
   }
 };
 
-// Update user profile
+// Complete a password reset with the emailed code.
+export const confirmPasswordReset = async (email, code, newPassword) => {
+  try {
+    await confirmPassword(email, code, newPassword);
+    return true;
+  } catch (error) {
+    console.error("Password reset confirmation error:", error);
+    throw new Error("Failed to reset password. Check your code and try again.");
+  }
+};
+
+// Update the profile via the backend.
 export const updateUserProfile = async (userId, updates) => {
   try {
-    console.log('Updating user profile:', userId, updates);
-    
-    // Validate inputs
-    if (!userId) {
-      throw new Error('User ID is required');
-    }
-    
+    if (!userId) throw new Error("User ID is required");
     if (!updates || Object.keys(updates).length === 0) {
-      throw new Error('No updates provided');
+      throw new Error("No updates provided");
     }
-
-    // Check if user is authenticated
-    if (!auth.currentUser) {
-      throw new Error('User not authenticated');
-    }
-
-    // Check if the authenticated user matches the userId
-    if (auth.currentUser.uid !== userId) {
-      throw new Error('User ID mismatch');
-    }
-
-    console.log('Firebase auth state:', {
-      currentUser: !!auth.currentUser,
-      uid: auth.currentUser?.uid,
-      email: auth.currentUser?.email
-    });
-
-    const userRef = doc(db, 'users', userId);
-    
-    console.log('Attempting to update Firestore document...');
-    
-    try {
-      // Try to update the document first
-      await updateDoc(userRef, {
-        ...updates,
-        updatedAt: serverTimestamp()
-      });
-      console.log('Firestore document updated successfully');
-    } catch (updateError) {
-      // If document doesn't exist, create it with setDoc
-      if (updateError.code === 'not-found') {
-        console.log('Document not found, creating new document...');
-        await setDoc(userRef, {
-          uid: userId,
-          email: auth.currentUser?.email,
-          ...updates,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        });
-        console.log('Firestore document created successfully');
-      } else {
-        // Re-throw other errors
-        throw updateError;
-      }
-    }
-
-    // Also update auth profile if name changed
-    if (updates.name && auth.currentUser) {
-      console.log('Updating auth profile display name...');
-      await updateProfile(auth.currentUser, {
-        displayName: updates.name
-      });
-      console.log('Auth profile updated successfully');
-    }
-
+    await authAPI.updateProfile(updates);
     return true;
   } catch (error) {
-    console.error('Profile update error details:', {
-      message: error.message,
-      code: error.code,
-      stack: error.stack,
-      userId,
-      updates
-    });
-    
-    // Provide more specific error messages
-    if (error.code === 'permission-denied') {
-      throw new Error('Permission denied. Please check your account permissions.');
-    } else if (error.code === 'not-found') {
-      throw new Error('User profile not found. Please try signing in again.');
-    } else if (error.code === 'unavailable') {
-      throw new Error('Database temporarily unavailable. Please try again.');
-    } else if (error.message.includes('User not authenticated')) {
-      throw new Error('User not authenticated. Please sign in again.');
-    } else if (error.message.includes('User ID')) {
-      throw new Error('Invalid user ID. Please sign in again.');
-    } else {
-      throw new Error(`Failed to update profile: ${error.message}`);
-    }
+    console.error("Profile update error:", error);
+    throw new Error(`Failed to update profile: ${error.message}`);
   }
 };
 
-// Get user profile
+// Get the profile via the backend.
 export const getUserProfile = async (userId) => {
   try {
-    console.log('Getting user profile:', userId);
-    
-    if (!userId) {
-      console.error('No userId provided to getUserProfile');
-      return null;
-    }
-    
-    const userDoc = await getDoc(doc(db, 'users', userId));
-    
-    if (userDoc.exists()) {
-      const profileData = userDoc.data();
-      console.log('Profile found:', profileData);
-      return profileData;
-    } else {
-      console.log('No profile document found for user:', userId);
-      return null;
-    }
+    if (!userId) return null;
+    const res = await authAPI.getProfile();
+    return res.data.user || null;
   } catch (error) {
-    console.error('Get profile error:', error);
-    
-    // Don't throw error, return null to allow graceful handling
-    if (error.code === 'permission-denied') {
-      console.error('Permission denied accessing user profile');
-    } else if (error.code === 'unavailable') {
-      console.error('Firestore temporarily unavailable');
-    }
-    
+    if (error.response && error.response.status === 404) return null;
+    console.error("Get profile error:", error);
     return null;
   }
 };
 
-// Auth state listener
-export const onAuthStateChange = (callback) => {
-  return onAuthStateChanged(auth, callback);
-};
+// Auth state listener (Cognito).
+export const onAuthStateChange = (callback) => cognitoOnAuthStateChange(callback);
 
-// Helper: Calculate daily calories based on user data
+// Helper: Mifflin-St Jeor daily calories.
 const calculateDailyCalories = (userData) => {
   const { gender, age, height, weight } = userData;
-  
-  // Mifflin-St Jeor Equation
   let bmr;
-  if (gender === 'male') {
-    bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+  if (gender === "male") {
+    bmr = 10 * weight + 6.25 * height - 5 * age + 5;
   } else {
-    bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+    bmr = 10 * weight + 6.25 * height - 5 * age - 161;
   }
-  
-  // Multiply by activity factor (assuming lightly active)
-  const dailyCalories = Math.round(bmr * 1.375);
-  
-  return dailyCalories;
+  return Math.round(bmr * 1.375);
 };
 
-
-
-// Helper: Get user-friendly error messages
-const getFirebaseErrorMessage = (errorCode) => {
-  switch (errorCode) {
-    case 'auth/user-not-found':
-      return 'No account found with this email address. Please check your email or create a new account.';
-    case 'auth/wrong-password':
-      return 'Incorrect password. Please try again or reset your password.';
-    case 'auth/invalid-credential':
-      return 'Invalid email or password. Please check your credentials and try again.';
-    case 'auth/email-already-in-use':
-      return 'An account with this email already exists. Please sign in instead.';
-    case 'auth/weak-password':
-      return 'Password is too weak. Please choose a stronger password (at least 6 characters).';
-    case 'auth/invalid-email':
-      return 'Please enter a valid email address.';
-    case 'auth/network-request-failed':
-      return 'Network error. Please check your internet connection and try again.';
-    case 'auth/too-many-requests':
-      return 'Too many failed attempts. Please wait a few minutes before trying again.';
-    case 'auth/user-disabled':
-      return 'This account has been disabled. Please contact support.';
-    case 'auth/operation-not-allowed':
-      return 'This sign-in method is not enabled. Please contact support.';
+// Helper: map Cognito / API errors to friendly messages.
+const getAuthErrorMessage = (error) => {
+  const name = error && error.name;
+  const apiMsg =
+    error && error.response && error.response.data && error.response.data.message;
+  switch (name) {
+    case "NotAuthorizedException":
+      return "Incorrect email or password. Please try again.";
+    case "UserNotFoundException":
+      return "No account found with this email address.";
+    case "UsernameExistsException":
+      return "An account with this email already exists. Please sign in instead.";
+    case "InvalidPasswordException":
+      return "Password is too weak. Use at least 8 characters with upper, lower, and a number.";
+    case "InvalidParameterException":
+      return "Please enter a valid email and password.";
+    case "TooManyRequestsException":
+    case "LimitExceededException":
+      return "Too many attempts. Please wait a few minutes and try again.";
     default:
-      return `Authentication error: ${errorCode}. Please try again or contact support.`;
+      return apiMsg || (error && error.message) || "Authentication error. Please try again.";
   }
 };
 
@@ -381,9 +206,10 @@ const authService = {
   loginWithGoogle,
   logoutUser,
   resetPassword,
+  confirmPasswordReset,
   updateUserProfile,
   getUserProfile,
-  onAuthStateChange
+  onAuthStateChange,
 };
 
 export default authService;

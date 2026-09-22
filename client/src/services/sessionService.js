@@ -1,7 +1,7 @@
 // Session Management Service with Analytics and Auto-logout
-import { signOut } from 'firebase/auth';
-import { doc, setDoc, updateDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '../firebase/config';
+// Auth via Cognito; session analytics persisted via the backend API (no direct DB).
+import { auth } from '../firebase/config';
+import api from './api';
 import storageService from './storageService';
 
 class SessionService {
@@ -331,9 +331,9 @@ class SessionService {
     // Clear session
     this.endSession();
 
-    // Sign out from Firebase
+    // Sign out from Cognito
     try {
-      await signOut(auth);
+      await auth.signOut();
       console.log('✅ Auto-logout successful');
 
       // Show logout message
@@ -352,9 +352,9 @@ class SessionService {
     // Clear session
     this.endSession();
 
-    // Sign out from Firebase
+    // Sign out from Cognito
     try {
-      await signOut(auth);
+      await auth.signOut();
       console.log('✅ Manual logout successful');
     } catch (error) {
       console.error('❌ Manual logout error:', error);
@@ -520,19 +520,13 @@ class SessionService {
 
   async saveSessionStart() {
     try {
-      const sessionDoc = {
-        userId: this.sessionData.userId,
-        sessionStart: new Date(this.sessionData.sessionStart),
+      const res = await api.post('/data/sessions', {
+        startTime: new Date(this.sessionData.sessionStart).toISOString(),
         loginMethod: this.sessionData.loginMethod,
         deviceInfo: this.sessionData.deviceInfo,
-        isActive: true,
-        createdAt: serverTimestamp()
-      };
-
-      const docRef = await addDoc(collection(db, 'userSessions'), sessionDoc);
-      this.sessionData.sessionId = docRef.id;
-
-      console.log('✅ Session start saved to Firestore');
+      });
+      this.sessionData.sessionId = res.data.id;
+      console.log('✅ Session start saved');
     } catch (error) {
       console.error('❌ Error saving session start:', error);
     }
@@ -541,22 +535,15 @@ class SessionService {
   async saveSessionEnd() {
     try {
       if (!this.sessionData.sessionId) return;
-
       const sessionEnd = Date.now();
-      const duration = sessionEnd - this.sessionData.sessionStart;
-
-      const updateData = {
-        sessionEnd: new Date(sessionEnd),
-        duration: duration,
+      await api.put(`/data/sessions/${this.sessionData.sessionId}`, {
+        sessionEnd: new Date(sessionEnd).toISOString(),
+        duration: sessionEnd - this.sessionData.sessionStart,
         pagesVisited: this.sessionData.pagesVisited,
         featuresUsed: this.sessionData.featuresUsed,
         isActive: false,
-        updatedAt: serverTimestamp()
-      };
-
-      await updateDoc(doc(db, 'userSessions', this.sessionData.sessionId), updateData);
-
-      console.log('✅ Session end saved to Firestore');
+      });
+      console.log('✅ Session end saved');
     } catch (error) {
       console.error('❌ Error saving session end:', error);
     }
@@ -565,15 +552,11 @@ class SessionService {
   async updateSessionAnalytics() {
     try {
       if (!this.sessionData.sessionId) return;
-
-      const currentDuration = Date.now() - this.sessionData.sessionStart;
-
-      await updateDoc(doc(db, 'userSessions', this.sessionData.sessionId), {
-        currentDuration: currentDuration,
-        lastActivity: new Date(this.sessionData.lastActivity),
+      await api.put(`/data/sessions/${this.sessionData.sessionId}`, {
+        currentDuration: Date.now() - this.sessionData.sessionStart,
+        lastActivity: new Date(this.sessionData.lastActivity).toISOString(),
         pagesVisited: this.sessionData.pagesVisited,
         featuresUsed: this.sessionData.featuresUsed,
-        updatedAt: serverTimestamp()
       });
     } catch (error) {
       console.error('❌ Error updating session analytics:', error);
@@ -582,16 +565,13 @@ class SessionService {
 
   async trackLogout(logoutType) {
     try {
-      const logoutData = {
-        userId: this.sessionData.userId,
-        sessionId: this.sessionData.sessionId,
-        logoutType: logoutType, // 'manual', 'auto_inactivity', 'browser_close'
-        timestamp: serverTimestamp(),
+      if (!this.sessionData.sessionId) return;
+      await api.put(`/data/sessions/${this.sessionData.sessionId}`, {
+        logoutType, // 'manual', 'auto_inactivity', 'browser_close'
+        logoutAt: new Date().toISOString(),
         sessionDuration: Date.now() - this.sessionData.sessionStart,
-        deviceInfo: this.sessionData.deviceInfo
-      };
-
-      await addDoc(collection(db, 'userLogouts'), logoutData);
+        isActive: false,
+      });
       console.log('✅ Logout tracked:', logoutType);
     } catch (error) {
       console.error('❌ Error tracking logout:', error);

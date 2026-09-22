@@ -52,7 +52,7 @@ const mockStorage = {
 router.get('/announcements/active', async (req, res) => {
   try {
     // Try to get from database first
-    const admin = require('firebase-admin');
+    const { admin } = require('../config/firebase');
     const db = admin.firestore();
     
     const snapshot = await db
@@ -82,7 +82,7 @@ router.get('/health-tips/active', async (req, res) => {
     const { category = 'all' } = req.query;
     
     // Try to get from database first
-    const admin = require('firebase-admin');
+    const { admin } = require('../config/firebase');
     const db = admin.firestore();
     
     let query = db.collection('healthTips').where('isActive', '==', true);
@@ -120,7 +120,7 @@ router.get('/health-tips/active', async (req, res) => {
 router.get('/success-stories/active', async (req, res) => {
   try {
     // Try to get from database first
-    const admin = require('firebase-admin');
+    const { admin } = require('../config/firebase');
     const db = admin.firestore();
     
     const snapshot = await db
@@ -149,7 +149,7 @@ router.post('/health-tips/:id/like', async (req, res) => {
     const { id } = req.params;
     
     // Try to update in database first
-    const admin = require('firebase-admin');
+    const { admin } = require('../config/firebase');
     const db = admin.firestore();
     
     const docRef = db.collection('healthTips').doc(id);

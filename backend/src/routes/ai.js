@@ -4,8 +4,8 @@ const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const { asyncHandler, AppError } = require('../middleware/errorHandler');
 const { limitTextInput, limitIngredientsInput, limitImageInput } = require('../middleware/inputLimit');
-const geminiService = require('../services/geminiService');
-const vertexAIService = require('../services/vertexAIGenAIService');
+const geminiService = require('../services/bedrockService');
+const vertexAIService = require('../services/bedrockService');
 const mockFoodService = require('../services/mockFoodService');
 
 const router = express.Router();

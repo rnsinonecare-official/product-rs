@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../../context/UserContext';
 import toast from 'react-hot-toast';
+import { authAPI } from '../../services/api';
 import {
   User,
   Mail,
@@ -156,58 +157,16 @@ const ProfileSettings = () => {
     const loadingToast = toast.loading('Deleting your account...');
     
     try {
-      // Import Firebase functions
-      const { auth, db } = await import('../../firebase/config');
-      const { deleteUser } = await import('firebase/auth');
-      const { doc, deleteDoc, collection, query, where, getDocs } = await import('firebase/firestore');
-      
-      const user = auth.currentUser;
-      if (!user) {
-        throw new Error('No authenticated user found');
-      }
+      // Delete the account via the backend (removes DynamoDB data + Cognito user).
+      // All privileged deletion happens server-side; the browser never touches the DB.
+      await authAPI.deleteAccount();
+      console.log('✅ Account deleted via backend');
 
-      console.log('Starting account deletion for user:', user.uid);
-
-      // Step 1: Delete user data from Firestore first
-      try {
-        const userDocRef = doc(db, 'users', user.uid);
-        await deleteDoc(userDocRef);
-        console.log('✅ User document deleted successfully');
-      } catch (firestoreError) {
-        console.warn('⚠️ Error deleting user document (may not exist):', firestoreError);
-        // Continue with deletion even if user doc doesn't exist
-      }
-
-      // Step 2: Delete any additional user data (health records, progress, etc.)
-      const collections = ['healthData', 'progressRecords', 'mealPlans', 'userPreferences'];
-      
-      for (const collectionName of collections) {
-        try {
-          const q = query(collection(db, collectionName), where('userId', '==', user.uid));
-          const querySnapshot = await getDocs(q);
-          
-          if (!querySnapshot.empty) {
-            const deletePromises = querySnapshot.docs.map(docSnapshot => deleteDoc(docSnapshot.ref));
-            await Promise.all(deletePromises);
-            console.log(`✅ Deleted ${querySnapshot.docs.length} documents from ${collectionName}`);
-          } else {
-            console.log(`ℹ️ No documents found in ${collectionName}`);
-          }
-        } catch (collectionError) {
-          console.warn(`⚠️ Error deleting from ${collectionName}:`, collectionError);
-          // Continue with deletion even if some collections fail
-        }
-      }
-
-      // Step 3: Clear localStorage and session storage
+      // Clear local + session storage
       localStorage.clear();
       sessionStorage.clear();
       console.log('✅ Local storage cleared');
-      
-      // Step 4: Delete the Firebase Auth user account (this is where the error usually occurs)
-      await deleteUser(user);
-      console.log('✅ Firebase Auth user deleted successfully');
-      
+
       // Dismiss loading toast and show success
       toast.dismiss(loadingToast);
       toast.success('Account deleted successfully! Redirecting to login page...');
@@ -238,29 +197,18 @@ const ProfileSettings = () => {
     const loadingToast = toast.loading('Verifying password...');
 
     try {
-      // Import Firebase functions
-      const { auth } = await import('../../firebase/config');
-      const { reauthenticateWithCredential, EmailAuthProvider } = await import('firebase/auth');
-      
-      const user = auth.currentUser;
-      if (!user || !user.email) {
-        throw new Error('No authenticated user found');
-      }
-
-      // Create credential and re-authenticate
-      const credential = EmailAuthProvider.credential(user.email, reauthPassword);
-      await reauthenticateWithCredential(user, credential);
-      
+      // Cognito self-deletion is authorized server-side via the user's token,
+      // so no client-side re-authentication is required.
       toast.dismiss(loadingToast);
-      toast.success('Password verified! Deleting account...');
-      
+      toast.success('Deleting account...');
+
       // Close re-auth modal
       setShowReauthModal(false);
       setReauthPassword('');
-      
-      // Now perform the account deletion
+
+      // Perform the account deletion via the backend
       await performAccountDeletion();
-      
+
     } catch (error) {
       toast.dismiss(loadingToast);
       console.error('❌ Re-authentication failed:', error);

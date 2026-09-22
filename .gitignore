@@ -27,6 +27,14 @@ admin/.env
 firebase-debug.log
 .firebase/
 
+# Secrets / credentials — NEVER commit these
+*service-account*.json
+*service-account*.txt
+temp-credentials.json
+**/vercel-env-vars.txt
+*.pem
+*.key
+
 # Vercel
 .vercel
 
