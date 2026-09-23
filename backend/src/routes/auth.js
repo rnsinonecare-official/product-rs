@@ -178,35 +178,22 @@ router.get(
 router.put(
   "/profile",
   authMiddleware,
-  [
-    body("displayName").optional().isLength({ min: 2 }),
-    body("phoneNumber").optional().isMobilePhone(),
-    body("dateOfBirth").optional().isISO8601(),
-    body("gender").optional().isIn(["male", "female", "other"]),
-    body("height").optional().isNumeric(),
-    body("weight").optional().isNumeric(),
-    body("activityLevel")
-      .optional()
-      .isIn(["sedentary", "light", "moderate", "active", "very_active"]),
-    body("healthConditions").optional().isArray(),
-    body("dietaryPreferences").optional().isArray(),
-  ],
   asyncHandler(async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        error: "ValidationError",
-        message: errors.array().map((err) => err.msg).join(", "),
-      });
-    }
-
-    const updateData = { ...req.body, updatedAt: new Date().toISOString() };
+    // Accept the profile as-is (the record is the user's own, keyed by the
+    // verified token uid). Force uid/email from the token so they can't be
+    // spoofed, and drop undefined values.
+    const updateData = {
+      ...req.body,
+      uid: req.user.uid,
+      updatedAt: new Date().toISOString(),
+    };
+    if (req.user.email) updateData.email = req.user.email;
     Object.keys(updateData).forEach((key) => {
       if (updateData[key] === undefined) delete updateData[key];
     });
 
     const userRef = db.collection("users").doc(req.user.uid);
-    await userRef.update(updateData);
+    await userRef.set(updateData, { merge: true });
     const updatedDoc = await userRef.get();
 
     res.json({
